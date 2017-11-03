@@ -12,11 +12,11 @@ class FileCopyer {
     FileCopyer() {
     }
 
-    void copyFiles(String sourceDirName, String targetDirName) { //Копирование файлов из одной дериктории в другую
+    void copyFiles(String lastversionDirName, String componentDirName) { //Копирование файлов из одной дериктории в другую
 
-        File folder = new File(sourceDirName);
+        File folder = new File(lastversionDirName);
         File[] listOfFiles = folder.listFiles(File::isFile);
-        Path destDir = Paths.get(targetDirName);
+        Path destDir = Paths.get(componentDirName);
         System.out.println("Copying files....");
 
         if (listOfFiles != null) {
