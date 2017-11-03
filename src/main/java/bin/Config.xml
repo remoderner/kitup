@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<config>
+    <project projectName="back" serverName="" pastDirName="D:\folderpast\">
+        <component
+                componentName="srvTest"
+                serviceName="2GISUpdateService"
+                sourceDirName="D:\foldersource\"
+                targetSourceDir="D:\foldertarget\"/>
+        <component
+                componentName="srvCBonds"
+                serviceName="URALSIB_srvCBonds"
+                sourceDirName="\\qlen\SoftPile\qort\Projects\backQORT\Last Versions x64\srvCBonds\"
+                targetSourceDir="\\QSOFT3\usr\URALSIB\srvComponents\srvCBonds\"/>
+        <component
+                componentName="srvCommissioner"
+                serviceName="Uralsib_srvCommissioner"
+                sourceDirName="\\qlen\SoftPile\qort\Projects\backQORT\Last Versions x64\srvCommissioner\"
+                targetSourceDir="\\QSOFT3\usr\URALSIB\srvComponents\srvCommissioner\"/>
+        <component
+                componentName="srvController"
+                serviceName="URALSIB_srvController"
+                sourceDirName="\\qlen\SoftPile\qort\Projects\backQORT\Last Versions x64\srvController\"
+                targetSourceDir="\\QSOFT3\usr\URALSIB\srvComponents\srvController\"/>
+        <component
+                componentName="srvDocMaker"
+                serviceName="URALSIB_srvDocMaker"
+                sourceDirName="\\qlen\SoftPile\qort\Projects\backQORT\Last Versions x64\srvDocMaker\"
+                targetSourceDir="\\QSOFT3\usr\URALSIB\srvComponents\srvDocMaker\"/>
+        <component
+                componentName="srvEfir"
+                serviceName="URALSIB_srvEfir"
+                sourceDirName="\\qlen\SoftPile\qort\Projects\backQORT\Last Versions x64\srvEfir\"
+                targetSourceDir="\\QSOFT3\usr\URALSIB\srvComponents\srvEfir\"/>
+        <component
+                componentName="srvInformer"
+                serviceName="URALSIB_srvInformer"
+                sourceDirName="\\qlen\SoftPile\qort\Projects\backQORT\Last Versions x64\srvInformer\"
+                targetSourceDir="\\QSOFT3\usr\URALSIB\srvComponents\srvInformer\"/>
+        <component
+                componentName="srvMessenger"
+                serviceName="URALSIB_srvMessenger"
+                sourceDirName="\\qlen\SoftPile\qort\Projects\backQORT\Last Versions x64\srvMessenger\"
+                targetSourceDir="\\QSOFT3\usr\URALSIB\srvComponents\srvMessenger\"/>
+        <component
+                componentName="srvNSDDisk"
+                serviceName="URALSIB_srvNSDDisk"
+                sourceDirName="\\qlen\SoftPile\qort\Projects\backQORT\Last Versions x64\srvNSDDisk\"
+                targetSourceDir="\\QSOFT3\usr\URALSIB\srvComponents\srvNSDDisk\"/>
+        <component
+                componentName="srvOTCReporter"
+                serviceName="srvOTCReporter"
+                sourceDirName="\\qlen\SoftPile\qort\Projects\backQORT\Last Versions x64\srvOTCReporter\"
+                targetSourceDir="\\QSOFT3\usr\URALSIB\srvComponents\srvOTCReporter\"/>
+        <component
+                componentName="srvPositioner"
+                serviceName="Uralsib_srvPositioner"
+                sourceDirName="\\qlen\SoftPile\qort\Projects\backQORT\Last Versions x64\srvPositioner\"
+                targetSourceDir="\\QSOFT3\usr\URALSIB\srvComponents\srvPositioner\"/>
+        <component
+                componentName="srvQ2DEPO"
+                serviceName="URALSIB_srvQ2DEPO"
+                sourceDirName="\\qlen\SoftPile\qort\Projects\backQORT\Last Versions x64\srvQ2DEPO\"
+                targetSourceDir="\\QSOFT3\usr\URALSIB\srvComponents\srvQ2DEPO\"/>
+        <component
+                componentName="srvQ2Q"
+                serviceName="Uralsib_srvQ2Q"
+                sourceDirName="\\qlen\SoftPile\qort\Projects\backQORT\Last Versions x64\srvQ2Q\"
+                targetSourceDir="\\QSOFT3\usr\URALSIB\srvComponents\srvQ2Q\"/>
+        <component
+                componentName="srvQUIK"
+                serviceName="Uralsib_srvQUIK"
+                sourceDirName="\\qlen\SoftPile\qort\Projects\backQORT\Last Versions x64\srvQUIK\"
+                targetSourceDir="\\QSOFT3\usr\URALSIB\srvComponents\srvQUIK\"/>
+        <component
+                componentName="srvReporter"
+                serviceName="URALSIB_srvReporter"
+                sourceDirName="\\qlen\SoftPile\qort\Projects\backQORT\Last Versions x64\srvReporter\"
+                targetSourceDir="\\QSOFT3\usr\URALSIB\srvComponents\srvReporter\"/>
+        <component
+                componentName="srvRisks"
+                serviceName="Uralsib_srvRisks"
+                sourceDirName="\\qlen\SoftPile\qort\Projects\backQORT\Last Versions x64\srvRisks\"
+                targetSourceDir="\\QSOFT3\usr\URALSIB\srvComponents\srvRisks\"/>
+        <component
+                componentName="srvScheduler"
+                serviceName="Uralsib_srvScheduler"
+                sourceDirName="\\qlen\SoftPile\qort\Projects\backQORT\Last Versions x64\srvScheduler\"
+                targetSourceDir="\\QSOFT3\usr\URALSIB\srvComponents\srvScheduler\"/>
+        <component
+                componentName="srvTDB"
+                serviceName="Uralsib_srvTDB"
+                sourceDirName="\\qlen\SoftPile\qort\Projects\backQORT\Last Versions x64\srvTDB\"
+                targetSourceDir="\\QSOFT3\usr\URALSIB\srvComponents\srvTDB\"/>
+    </project>
+
+    <project projectName="mid" serverName="\\qsoft4\">
+        <component
+                componentName="srvCBonds"
+                serviceName="OPEN_srvCBonds"
+                sourceDirName="\\qlen\SoftPile\qort\Projects\midQORT\Last Versions x64\srvCBonds\"
+                targetSourceDir="\\qsoft4\usr\OPEN\srvComponents\srvCBonds\"/>
+        <component
+                componentName="srvPositioner"
+                serviceName="OPEN_srvPositioner"
+                sourceDirName="\\qlen\SoftPile\qort\Projects\midQORT\Last Versions x64\srvPositioner\"
+                targetSourceDir="\\qsoft4\usr\OPEN\srvComponents\srvPositioner\"/>
+        <component
+                componentName="srvReporter"
+                serviceName="OPEN_srvReporter"
+                sourceDirName="\\qlen\SoftPile\qort\Projects\midQORT\Last Versions x64\srvReporter\"
+                targetSourceDir="\\qsoft4\usr\OPEN\srvComponents\srvReporter\"/>
+        <component
+                componentName="srvTDB"
+                serviceName="OPEN_srvTDB"
+                sourceDirName="\\qlen\SoftPile\qort\Projects\midQORT\Last Versions x64\srvTDB\"
+                targetSourceDir="\\qsoft4\usr\OPEN\srvComponents\srvTDB\"/>
+    </project>
+
+    <project projectName="cap" serverName="\\qsoft2\">
+        <component
+                componentName="srvCBonds"
+                serviceName="capQORT_srvCBonds"
+                sourceDirName="\\qsoft2\qort\capQort\srvComponents\srvCBonds\"
+                targetSourceDir="\\qlen\SoftPile\qort\Projects\capQORT\Last Versions x64\srvCBonds\"/>
+
+        <component
+                componentName="srvCommissioner"
+                serviceName="capQORT_srvCommissioner"
+                sourceDirName="\\qsoft2\qort\capQort\srvComponents\srvCommissioner\"
+                targetSourceDir="\\qlen\SoftPile\qort\Projects\capQORT\Last Versions x64\srvCommissioner\"/>
+    </project>
+
+    <project projectName="crm" serverName="\\qsoft3\">
+
+    </project>
+
+    <project projectName="depo" serverName="\\qsoft4\">
+        <component
+                componentName="srvCorpNSD"
+                serviceName="depoQort_srvCorpNSD"
+                sourceDirName="\\qlen\SoftPile\qort\Projects\depoQORT\Last Versions x64\srvCorpNSD\"
+                targetSourceDir="\\qsoft4\usr\depoQort\srvComponents\srvCorpNSD\"/>
+
+        <component
+                componentName="srvDocMaker"
+                serviceName="depoQort_srvDocMaker"
+                sourceDirName="\\qlen\SoftPile\qort\Projects\depoQORT\Last Versions x64\srvDocMaker\"
+                targetSourceDir="\\qsoft4\usr\depoQort\srvComponents\srvDocMaker\"/>
+
+        <component
+                componentName="srvOperator"
+                serviceName="depoQort_srvOperator"
+                sourceDirName="\\qlen\SoftPile\qort\Projects\depoQORT\Last Versions x64\srvOperator\"
+                targetSourceDir="\\qsoft4\usr\depoQort\srvComponents\srvOperator\"/>
+
+        <component
+                componentName="srvPositioner"
+                serviceName="depoQort_srvPositioner"
+                sourceDirName="\\qlen\SoftPile\qort\Projects\depoQORT\Last Versions x64\srvPositioner\"
+                targetSourceDir="\\qsoft4\usr\depoQort\srvComponents\srvPositioner\"/>
+
+        <component
+                componentName="srvReporter"
+                serviceName="depoQort_srvReporter"
+                sourceDirName="\\qlen\SoftPile\qort\Projects\depoQORT\Last Versions x64\srvReporter\"
+                targetSourceDir="\\qsoft4\usr\depoQort\srvComponents\srvReporter\"/>
+
+        <component
+                componentName="srvTDB"
+                serviceName="depoQort_srvTDB"
+                sourceDirName="\\qlen\SoftPile\qort\Projects\depoQORT\Last Versions x64\srvTDB\"
+                targetSourceDir="\\qsoft4\usr\depoQort\srvComponents\srvTDB\"/>
+    </project>
+</config>
