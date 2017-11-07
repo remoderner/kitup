@@ -23,6 +23,7 @@ import view.OptionListController;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class GUIGenerator extends Application {
     private DataGenerator dataGenerator = new DataGenerator("Config.xml");
@@ -30,6 +31,7 @@ public class GUIGenerator extends Application {
     private Stage primaryStage;
     private BorderPane rootLayout;
     private int maxCountComponents;
+    private HashSet<String> openComponentLists = new HashSet<>();
 
     public GUIGenerator() {
     }
@@ -58,6 +60,7 @@ public class GUIGenerator extends Application {
 
         // Отображение сцены, содержащую корневой макет
         Scene scene = new Scene(rootLayout);
+        scene.getStylesheets().add("/Stylesheet.css");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -139,7 +142,6 @@ public class GUIGenerator extends Application {
             button.setMinWidth(150);
             button.setOnAction(
                     (e) -> {
-                        button.setStyle("-fx-background-color: #00FA9A;");
                         button.setDisable(true);
 
                         Service backqroundThread = new Service<Void>() {
@@ -153,11 +155,7 @@ public class GUIGenerator extends Application {
                             }
                         };
 
-                        backqroundThread.setOnSucceeded(event -> {
-                            button.setStyle(null);
-                            button.setDisable(false);
-                        });
-
+                        backqroundThread.setOnSucceeded(event -> button.setDisable(false));
                         backqroundThread.restart();
                     }
             );
@@ -175,14 +173,18 @@ public class GUIGenerator extends Application {
         ArrayList<Button> componentOptionList = new ArrayList<>();
 
         for (Component component : components) {
-            Button button = new Button();
-            button.setText("");
-            button.setPrefWidth(14);
-            button.setOnAction(
-                    (ActionEvent event) -> ShowOptionList(project, component)
-            );
+            Button moreOptionsButton = new Button();
+            moreOptionsButton.setText("");
+            moreOptionsButton.setPrefWidth(14);
+            moreOptionsButton.setOnAction(
+                    (ActionEvent event) -> {
+                        if (!openComponentLists.contains(project.getProjectName() + "." + component.getComponentName())) {
+                            openComponentLists.add(project.getProjectName() + "." + component.getComponentName());
+                            ShowOptionList(project, component);
+                        }
+                    });
 
-            componentOptionList.add(button);
+            componentOptionList.add(moreOptionsButton);
         }
         return componentOptionList;
     }
@@ -203,6 +205,7 @@ public class GUIGenerator extends Application {
             dialogStage.initStyle(StageStyle.UTILITY);
             dialogStage.initOwner(null);
             dialogStage.setResizable(false);
+            dialogStage.setOnCloseRequest(e -> openComponentLists.remove(project.getProjectName() + "." + component.getComponentName()));
 
             Scene scene = new Scene(page);
             dialogStage.setScene(scene);

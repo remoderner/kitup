@@ -27,7 +27,7 @@ class DataGenerator {
         String filePath = new File("").getAbsolutePath(); //Получить путь к текущему каталогу
 
         try {
-            File xmlFile = new File(filePath.concat("/src/main/java/bin/" + configFileName));
+            File xmlFile = new File(filePath.concat("//src/main/java/bin/" + configFileName)); ///src/main/java/bin/
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(xmlFile);

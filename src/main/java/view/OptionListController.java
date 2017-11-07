@@ -12,8 +12,10 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 public class OptionListController {
+    private static Logger log = Logger.getLogger(OptionListController.class.getName());
 
     @FXML
     private Button update;
@@ -94,6 +96,7 @@ public class OptionListController {
             update.setDisable(false);
         });
 
+        update.setDisable(true);
         backqroundThread.restart();
     }
 
@@ -118,6 +121,7 @@ public class OptionListController {
             restart.setDisable(false);
         });
 
+        restart.setDisable(true);
         backqroundThread.restart();
     }
 
@@ -142,6 +146,7 @@ public class OptionListController {
             start.setDisable(false);
         });
 
+        start.setDisable(true);
         backqroundThread.restart();
     }
 
@@ -166,6 +171,7 @@ public class OptionListController {
             stop.setDisable(false);
         });
 
+        stop.setDisable(true);
         backqroundThread.restart();
     }
 
@@ -174,9 +180,10 @@ public class OptionListController {
      */
     @FXML
     private void getRollbackDates() {
-        getRollbackDates.setStyle("-fx-background-color: #00FA9A;");
-        getRollbackDates.setDisable(true);
-        rollbackDates.getChildren().clear(); //Удалить кнопки откатов
+
+        /*
+         * Запуск создания кнопок для отката компоненты в отдельном потоке
+         */
         Service backqroundThread = new Service<Void>() {
             protected Task<Void> createTask() {
                 return new Task<>() {
@@ -187,15 +194,19 @@ public class OptionListController {
                             if (pastFolder == null) { //Если папки с откатом не найдено, то не добавляем кнопку
                                 continue;
                             }
-                            String pathPastVersion = pathSales + "\\" + pastFolder + "\\" + "SrvComp" + "\\" + componentName;
+                            String pathPastVersion = pathSales + pastFolder + "\\" + "SrvComp" + "\\" + componentName;
                             System.out.println("Путь к откату: " + pathPastVersion);
+                            log.info("Путь к откату: " + pathPastVersion);
                             Button button = new Button();
                             button.setText(entry);
                             button.setPrefWidth(108);
                             button.setOnAction(
                                     (e) -> {
-                                        button.setStyle("-fx-background-color: #00FA9A;");
+                                        button.getStylesheets().add("/Stylesheet.css");
                                         button.setDisable(true);
+                                        /*
+                                         * Запуск отката компоненты в отдельном потоке
+                                         */
                                         Service backqroundThread = new Service<Void>() {
                                             protected Task<Void> createTask() {
                                                 return new Task<>() {
@@ -207,34 +218,29 @@ public class OptionListController {
                                             }
                                         };
 
-                                        backqroundThread.setOnSucceeded(event -> {
-                                            button.setStyle(null);
-                                            button.setDisable(false);
-                                        });
-
+                                        backqroundThread.setOnSucceeded(event -> button.setDisable(false));
                                         backqroundThread.restart();
                                     }
                             );
 
                             rollbackDateButtonList.add(button);
                         }
-
                         /*
                          * Передаем обновление GUI (добавление новых кнопок) в основной поток
                          */
                         Platform.runLater(() -> setRollbackDates(rollbackDateButtonList));
-
                         return null;
                     }
                 };
             }
         };
 
-        backqroundThread.setOnSucceeded(event -> {
-            getRollbackDates.setStyle(null);
+        backqroundThread.setOnSucceeded(event -> { //После завершения вернуть кнопку в обычное состояние
             getRollbackDates.setDisable(false);
         });
 
+        rollbackDates.getChildren().clear();
+        getRollbackDates.setDisable(true);
         backqroundThread.restart();
     }
 }
