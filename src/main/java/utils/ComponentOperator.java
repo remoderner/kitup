@@ -15,7 +15,10 @@ import static java.util.Collections.reverseOrder;
 
 public class ComponentOperator {
     private static Logger log = Logger.getLogger(ComponentOperator.class.getName());
+    private FileInformator fileInformator;
+
     public ComponentOperator() {
+        fileInformator = new FileInformator();
     }
 
     /**
@@ -28,7 +31,7 @@ public class ComponentOperator {
      */
     public void updateComponent(String pathServer, String serviceName, String pathLastVersion, String pathComponent) { //Рестарт + обновление компоненты
         FileCopyer copyFiles = new FileCopyer();
-        log.info("Run updateComponent");
+        System.out.println("Run updateComponent");
 
         stopComponent(pathServer, serviceName);
         checkServiceStop(pathServer, serviceName);
@@ -74,7 +77,7 @@ public class ComponentOperator {
     /**
      * ROLLBACK Component
      */
-    public void rollbackComponent(String pathServer, String serviceName, String pathLastVersion, String pathComponent, String pathPastVersion) {
+    public void rollbackComponent(String pathServer, String serviceName, String pathComponent, String pathPastVersion) {
         FileCopyer copyFiles = new FileCopyer();
         log.info("Run rollbackComponent");
 
@@ -112,6 +115,7 @@ public class ComponentOperator {
     }
 
     /**
+     * CHECK SERVICE - STOP
      * Запрос состояния службы (ожидание остановки)
      */
     private void checkServiceStop(String pathServer, String serviceName) {
@@ -140,9 +144,19 @@ public class ComponentOperator {
                 }
             }
         } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+            System.err.println("Error check service :" + e.toString());
         }
     }
+
+    /**
+     * GET COMPONENT VERSION
+     */
+    public String getComponentVersion(String componentName, String pathComponent, String infoType) {
+        String fileVersion = fileInformator.getFileVersion(pathComponent + componentName, infoType);
+        System.out.println(fileVersion);
+        return fileVersion;
+    }
+
 
     /**
      * Вернуть даты для откатов (последние 3)

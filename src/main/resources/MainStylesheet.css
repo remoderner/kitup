@@ -1,0 +1,21 @@
+.button:disabled {
+}
+
+.button {
+    -fx-background-size: 100% 100%;
+    -fx-background-color: #f4f4f4, #c0c0c0, #f4f4f4;
+    -fx-background-insets: 1;
+    -fx-background-radius: 2;
+    -fx-border-color: #c0c0c0;
+    -fx-border-radius: 2;
+    -fx-focus-traversable: false;
+}
+
+.button:hover {
+    -fx-background-color: #e6e6e6, #c0c0c0, #e6e6e6;
+}
+
+.tab:selected .focus-indicator {
+    -fx-focus-color: transparent;
+    -fx-border-color: transparent;
+}
