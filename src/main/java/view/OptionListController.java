@@ -9,13 +9,13 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
-import java.util.logging.Logger;
+import java.util.Objects;
 
 public class OptionListController {
-    private static Logger log = Logger.getLogger(OptionListController.class.getName());
 
     @FXML
     private Button update;
@@ -34,6 +34,9 @@ public class OptionListController {
 
     @FXML
     private Button getRollbackDates;
+
+    @FXML
+    private Text componentVersion;
 
     private String pathServer;
     private String pathSales;
@@ -68,10 +71,19 @@ public class OptionListController {
         pathLastVersion = component.getLastVersionDirName();
         pathComponent = component.getComponentDirName();
         componentName = component.getComponentName();
+        String currentComponentVersion = guiGenerator.getComponentOperator().getComponentVersion(componentName + ".dll", pathComponent, "FileVersion");
+        String lastComponentVersion = guiGenerator.getComponentOperator().getComponentVersion(componentName + ".dll", pathLastVersion, "FileVersion");
+        componentVersion.setText(currentComponentVersion);
+
+        if (!Objects.equals(currentComponentVersion, lastComponentVersion)) {
+            update.getStylesheets().add("/ButtonWarning.css");
+        } else {
+            update.getStylesheets().add("/ButtonGood.css");
+        }
     }
 
     private void setRollbackDates(ArrayList<Button> rollbackDateButtonList) {
-        dialogStage.setHeight(274 + 35 * rollbackDateButtonList.size());
+        dialogStage.setHeight(293 + 37 * rollbackDateButtonList.size());
         rollbackDates.getChildren().addAll(rollbackDateButtonList);
     }
 
@@ -94,6 +106,12 @@ public class OptionListController {
         backqroundThread.setOnSucceeded(event -> {
             update.setStyle(null);
             update.setDisable(false);
+            String currentComponentVersion = guiGenerator.getComponentOperator().getComponentVersion(componentName + ".dll", pathComponent, "FileVersion");
+            String lastComponentVersion = guiGenerator.getComponentOperator().getComponentVersion(componentName + ".dll", pathLastVersion, "FileVersion");
+            if (Objects.equals(currentComponentVersion, lastComponentVersion)) {
+                Platform.runLater(() -> update.getStylesheets().add("/ButtonGood.css"));
+            }
+            componentVersion.setText(currentComponentVersion);
         });
 
         update.setDisable(true);
@@ -196,13 +214,12 @@ public class OptionListController {
                             }
                             String pathPastVersion = pathSales + pastFolder + "\\" + "SrvComp" + "\\" + componentName;
                             System.out.println("Путь к откату: " + pathPastVersion);
-                            log.info("Путь к откату: " + pathPastVersion);
                             Button button = new Button();
                             button.setText(entry);
                             button.setPrefWidth(108);
                             button.setOnAction(
                                     (e) -> {
-                                        button.getStylesheets().add("/Stylesheet.css");
+                                        button.getStylesheets().add("/MainStylesheet.css");
                                         button.setDisable(true);
                                         /*
                                          * Запуск отката компоненты в отдельном потоке
@@ -211,14 +228,24 @@ public class OptionListController {
                                             protected Task<Void> createTask() {
                                                 return new Task<>() {
                                                     protected Void call() {
-                                                        guiGenerator.getComponentOperator().rollbackComponent(pathServer, serviceName, pathLastVersion, pathComponent, pathPastVersion);
+                                                        guiGenerator.getComponentOperator().rollbackComponent(pathServer, serviceName, pathComponent, pathPastVersion);
                                                         return null;
                                                     }
                                                 };
                                             }
                                         };
 
-                                        backqroundThread.setOnSucceeded(event -> button.setDisable(false));
+                                        backqroundThread.setOnSucceeded(event -> {
+                                            button.setDisable(false);
+                                            String currentComponentVersion = guiGenerator.getComponentOperator().getComponentVersion(componentName + ".dll", pathComponent, "FileVersion");
+                                            String lastComponentVersion = guiGenerator.getComponentOperator().getComponentVersion(componentName + ".dll", pathLastVersion, "FileVersion");
+                                            if (!Objects.equals(currentComponentVersion, lastComponentVersion)) {
+                                                update.getStylesheets().add("/ButtonWarning.css");
+                                            } else {
+                                                update.getStylesheets().add("/ButtonGood.css");
+                                            }
+                                        });
+
                                         backqroundThread.restart();
                                     }
                             );

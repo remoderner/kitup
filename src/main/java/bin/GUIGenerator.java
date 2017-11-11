@@ -60,7 +60,7 @@ public class GUIGenerator extends Application {
 
         // Отображение сцены, содержащую корневой макет
         Scene scene = new Scene(rootLayout);
-        scene.getStylesheets().add("/Stylesheet.css");
+        scene.getStylesheets().add("/MainStylesheet.css");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -80,7 +80,7 @@ public class GUIGenerator extends Application {
         projectsOverview.getTabs().addAll(getProjectList());
 
         // Отправить макет проектов в корневой макет
-        rootLayout.setMinSize(200, 60 + 35 * maxCountComponents);
+        rootLayout.setMinSize(200, 60 + 37 * maxCountComponents);
         rootLayout.setCenter(projectsOverview);
     }
 
