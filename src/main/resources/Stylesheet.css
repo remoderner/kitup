@@ -1,0 +1,10 @@
+.button:disabled {
+    -fx-opacity: 1.0;
+    -fx-background-color: #9a4996;
+    -fx-text-fill: white;
+}
+
+.button {
+    -fx-focus-traversable: false;
+    -fx-focus-color: #9a4996;
+}
