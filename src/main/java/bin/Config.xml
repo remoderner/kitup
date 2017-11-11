@@ -1,133 +1,133 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <config>
-    <project projectName="back" serverName="" pastDirName="D:\folderpast\">
+    <project projectName="back" serverName="" salesDirName="D:\foldersales\">
         <component
                 componentName="srvTest"
                 serviceName="2GISUpdateService"
-                sourceDirName="D:\foldersource\"
-                targetSourceDir="D:\foldertarget\"/>
+                lastVersionDirName="D:\foldersource\"
+                componentDirName="D:\foldertarget\"/>
         <component
                 componentName="srvCBonds"
-                serviceName="URALSIB_srvCBonds"
-                sourceDirName="\\qlen\SoftPile\qort\Projects\backQORT\Last Versions x64\srvCBonds\"
-                targetSourceDir="\\QSOFT3\usr\URALSIB\srvComponents\srvCBonds\"/>
+                serviceName="2GISUpdateService"
+                lastVersionDirName="D:\foldersource\srvCBonds\"
+                componentDirName="D:\foldertarget\srvCBonds\"/>
         <component
                 componentName="srvCommissioner"
-                serviceName="Uralsib_srvCommissioner"
-                sourceDirName="\\qlen\SoftPile\qort\Projects\backQORT\Last Versions x64\srvCommissioner\"
-                targetSourceDir="\\QSOFT3\usr\URALSIB\srvComponents\srvCommissioner\"/>
+                serviceName="2GISUpdateService"
+                lastVersionDirName="D:\foldersource\srvCommissioner\"
+                componentDirName="D:\foldertarget\srvCommissioner\"/>
         <component
                 componentName="srvController"
-                serviceName="URALSIB_srvController"
-                sourceDirName="\\qlen\SoftPile\qort\Projects\backQORT\Last Versions x64\srvController\"
-                targetSourceDir="\\QSOFT3\usr\URALSIB\srvComponents\srvController\"/>
+                serviceName="2GISUpdateService"
+                lastVersionDirName="D:\foldersource\srvController\"
+                componentDirName="D:\foldertarget\srvController\"/>
         <component
                 componentName="srvDocMaker"
-                serviceName="URALSIB_srvDocMaker"
-                sourceDirName="\\qlen\SoftPile\qort\Projects\backQORT\Last Versions x64\srvDocMaker\"
-                targetSourceDir="\\QSOFT3\usr\URALSIB\srvComponents\srvDocMaker\"/>
+                serviceName="2GISUpdateService"
+                lastVersionDirName="D:\foldersource\srvDocMaker\"
+                componentDirName="D:\foldertarget\srvDocMaker\"/>
         <component
                 componentName="srvEfir"
-                serviceName="URALSIB_srvEfir"
-                sourceDirName="\\qlen\SoftPile\qort\Projects\backQORT\Last Versions x64\srvEfir\"
-                targetSourceDir="\\QSOFT3\usr\URALSIB\srvComponents\srvEfir\"/>
+                serviceName="2GISUpdateService"
+                lastVersionDirName="D:\foldersource\srvEfir\"
+                componentDirName="D:\foldertarget\srvEfir\"/>
         <component
                 componentName="srvInformer"
-                serviceName="URALSIB_srvInformer"
-                sourceDirName="\\qlen\SoftPile\qort\Projects\backQORT\Last Versions x64\srvInformer\"
-                targetSourceDir="\\QSOFT3\usr\URALSIB\srvComponents\srvInformer\"/>
+                serviceName="2GISUpdateService"
+                lastVersionDirName="D:\foldersource\srvInformer\"
+                componentDirName="D:\foldertarget\srvInformer\"/>
         <component
                 componentName="srvMessenger"
-                serviceName="URALSIB_srvMessenger"
-                sourceDirName="\\qlen\SoftPile\qort\Projects\backQORT\Last Versions x64\srvMessenger\"
-                targetSourceDir="\\QSOFT3\usr\URALSIB\srvComponents\srvMessenger\"/>
+                serviceName="2GISUpdateService"
+                lastVersionDirName="D:\foldersource\srvMessenger\"
+                componentDirName="D:\foldertarget\srvMessenger\"/>
         <component
                 componentName="srvNSDDisk"
-                serviceName="URALSIB_srvNSDDisk"
-                sourceDirName="\\qlen\SoftPile\qort\Projects\backQORT\Last Versions x64\srvNSDDisk\"
-                targetSourceDir="\\QSOFT3\usr\URALSIB\srvComponents\srvNSDDisk\"/>
+                serviceName="2GISUpdateService"
+                lastVersionDirName="D:\foldersource\srvNSDDisk\"
+                componentDirName="D:\foldertarget\srvNSDDisk\"/>
         <component
                 componentName="srvOTCReporter"
-                serviceName="srvOTCReporter"
-                sourceDirName="\\qlen\SoftPile\qort\Projects\backQORT\Last Versions x64\srvOTCReporter\"
-                targetSourceDir="\\QSOFT3\usr\URALSIB\srvComponents\srvOTCReporter\"/>
+                serviceName="2GISUpdateService"
+                lastVersionDirName="D:\foldersource\srvOTCReporter\"
+                componentDirName="D:\foldertarget\srvOTCReporter\"/>
         <component
                 componentName="srvPositioner"
-                serviceName="Uralsib_srvPositioner"
-                sourceDirName="\\qlen\SoftPile\qort\Projects\backQORT\Last Versions x64\srvPositioner\"
-                targetSourceDir="\\QSOFT3\usr\URALSIB\srvComponents\srvPositioner\"/>
+                serviceName="2GISUpdateService"
+                lastVersionDirName="D:\foldersource\srvPositioner\"
+                componentDirName="D:\foldertarget\srvPositioner\"/>
         <component
                 componentName="srvQ2DEPO"
-                serviceName="URALSIB_srvQ2DEPO"
-                sourceDirName="\\qlen\SoftPile\qort\Projects\backQORT\Last Versions x64\srvQ2DEPO\"
-                targetSourceDir="\\QSOFT3\usr\URALSIB\srvComponents\srvQ2DEPO\"/>
+                serviceName="2GISUpdateService"
+                lastVersionDirName="D:\foldersource\srvQ2DEPO\"
+                componentDirName="D:\foldertarget\srvQ2DEPO\"/>
         <component
                 componentName="srvQ2Q"
-                serviceName="Uralsib_srvQ2Q"
-                sourceDirName="\\qlen\SoftPile\qort\Projects\backQORT\Last Versions x64\srvQ2Q\"
-                targetSourceDir="\\QSOFT3\usr\URALSIB\srvComponents\srvQ2Q\"/>
+                serviceName="2GISUpdateService"
+                lastVersionDirName="D:\foldersource\srvQ2Q\"
+                componentDirName="D:\foldertarget\srvQ2Q\"/>
         <component
                 componentName="srvQUIK"
                 serviceName="Uralsib_srvQUIK"
-                sourceDirName="\\qlen\SoftPile\qort\Projects\backQORT\Last Versions x64\srvQUIK\"
-                targetSourceDir="\\QSOFT3\usr\URALSIB\srvComponents\srvQUIK\"/>
+                lastVersionDirName="D:\foldersource\srvQUIK\"
+                componentDirName="D:\foldertarget\srvQUIK\"/>
         <component
                 componentName="srvReporter"
-                serviceName="URALSIB_srvReporter"
-                sourceDirName="\\qlen\SoftPile\qort\Projects\backQORT\Last Versions x64\srvReporter\"
-                targetSourceDir="\\QSOFT3\usr\URALSIB\srvComponents\srvReporter\"/>
+                serviceName="2GISUpdateService"
+                lastVersionDirName="D:\foldersource\srvReporter\"
+                componentDirName="D:\foldertarget\srvReporter\"/>
         <component
                 componentName="srvRisks"
                 serviceName="Uralsib_srvRisks"
-                sourceDirName="\\qlen\SoftPile\qort\Projects\backQORT\Last Versions x64\srvRisks\"
-                targetSourceDir="\\QSOFT3\usr\URALSIB\srvComponents\srvRisks\"/>
+                lastVersionDirName="D:\foldersource\srvRisks\"
+                componentDirName="D:\foldertarget\srvRisks\"/>
         <component
                 componentName="srvScheduler"
-                serviceName="Uralsib_srvScheduler"
-                sourceDirName="\\qlen\SoftPile\qort\Projects\backQORT\Last Versions x64\srvScheduler\"
-                targetSourceDir="\\QSOFT3\usr\URALSIB\srvComponents\srvScheduler\"/>
+                serviceName="2GISUpdateService"
+                lastVersionDirName="D:\foldersource\srvScheduler\"
+                componentDirName="D:\foldertarget\srvScheduler\"/>
         <component
                 componentName="srvTDB"
-                serviceName="Uralsib_srvTDB"
-                sourceDirName="\\qlen\SoftPile\qort\Projects\backQORT\Last Versions x64\srvTDB\"
-                targetSourceDir="\\QSOFT3\usr\URALSIB\srvComponents\srvTDB\"/>
+                serviceName="2GISUpdateService"
+                lastVersionDirName="D:\foldersource\srvTDB\"
+                componentDirName="D:\foldertarget\srvTDB\"/>
     </project>
 
     <project projectName="mid" serverName="\\qsoft4\">
         <component
                 componentName="srvCBonds"
                 serviceName="OPEN_srvCBonds"
-                sourceDirName="\\qlen\SoftPile\qort\Projects\midQORT\Last Versions x64\srvCBonds\"
-                targetSourceDir="\\qsoft4\usr\OPEN\srvComponents\srvCBonds\"/>
+                lastVersionDirName="D:\foldersource\srvCBonds\"
+                componentDirName="D:\foldertarget\srvCBonds\"/>
         <component
                 componentName="srvPositioner"
-                serviceName="OPEN_srvPositioner"
-                sourceDirName="\\qlen\SoftPile\qort\Projects\midQORT\Last Versions x64\srvPositioner\"
-                targetSourceDir="\\qsoft4\usr\OPEN\srvComponents\srvPositioner\"/>
+                serviceName="2GISUpdateService"
+                lastVersionDirName="D:\foldersource\srvPositioner\"
+                componentDirName="D:\foldertarget\srvPositioner\"/>
         <component
                 componentName="srvReporter"
-                serviceName="OPEN_srvReporter"
-                sourceDirName="\\qlen\SoftPile\qort\Projects\midQORT\Last Versions x64\srvReporter\"
-                targetSourceDir="\\qsoft4\usr\OPEN\srvComponents\srvReporter\"/>
+                serviceName="2GISUpdateService"
+                lastVersionDirName="D:\foldersource\srvReporter\"
+                componentDirName="D:\foldertarget\srvReporter\"/>
         <component
                 componentName="srvTDB"
-                serviceName="OPEN_srvTDB"
-                sourceDirName="\\qlen\SoftPile\qort\Projects\midQORT\Last Versions x64\srvTDB\"
-                targetSourceDir="\\qsoft4\usr\OPEN\srvComponents\srvTDB\"/>
+                serviceName="2GISUpdateService"
+                lastVersionDirName="D:\foldersource\srvTDB\"
+                componentDirName="D:\foldertarget\srvTDB\"/>
     </project>
 
     <project projectName="cap" serverName="\\qsoft2\">
         <component
                 componentName="srvCBonds"
-                serviceName="capQORT_srvCBonds"
-                sourceDirName="\\qsoft2\qort\capQort\srvComponents\srvCBonds\"
-                targetSourceDir="\\qlen\SoftPile\qort\Projects\capQORT\Last Versions x64\srvCBonds\"/>
+                serviceName="2GISUpdateService"
+                lastVersionDirName="D:\foldersource\srvCBonds\"
+                componentDirName="D:\foldertarget\srvCBonds\"/>
 
         <component
                 componentName="srvCommissioner"
-                serviceName="capQORT_srvCommissioner"
-                sourceDirName="\\qsoft2\qort\capQort\srvComponents\srvCommissioner\"
-                targetSourceDir="\\qlen\SoftPile\qort\Projects\capQORT\Last Versions x64\srvCommissioner\"/>
+                serviceName="2GISUpdateService"
+                lastVersionDirName="D:\foldersource\srvCommissioner\"
+                componentDirName="D:\foldertarget\srvCommissioner\"/>
     </project>
 
     <project projectName="crm" serverName="\\qsoft3\">
@@ -137,38 +137,38 @@
     <project projectName="depo" serverName="\\qsoft4\">
         <component
                 componentName="srvCorpNSD"
-                serviceName="depoQort_srvCorpNSD"
-                sourceDirName="\\qlen\SoftPile\qort\Projects\depoQORT\Last Versions x64\srvCorpNSD\"
-                targetSourceDir="\\qsoft4\usr\depoQort\srvComponents\srvCorpNSD\"/>
+                serviceName="2GISUpdateService"
+                lastVersionDirName="D:\foldersource\srvCorpNSD\"
+                componentDirName="D:\foldertarget\srvCorpNSD\"/>
 
         <component
                 componentName="srvDocMaker"
                 serviceName="depoQort_srvDocMaker"
-                sourceDirName="\\qlen\SoftPile\qort\Projects\depoQORT\Last Versions x64\srvDocMaker\"
-                targetSourceDir="\\qsoft4\usr\depoQort\srvComponents\srvDocMaker\"/>
+                lastVersionDirName="D:\foldersource\srvDocMaker\"
+                componentDirName="D:\foldertarget\srvDocMaker\"/>
 
         <component
                 componentName="srvOperator"
-                serviceName="depoQort_srvOperator"
-                sourceDirName="\\qlen\SoftPile\qort\Projects\depoQORT\Last Versions x64\srvOperator\"
-                targetSourceDir="\\qsoft4\usr\depoQort\srvComponents\srvOperator\"/>
+                serviceName="2GISUpdateService"
+                lastVersionDirName="D:\foldersource\srvOperator\"
+                componentDirName="D:\foldertarget\srvOperator\"/>
 
         <component
                 componentName="srvPositioner"
-                serviceName="depoQort_srvPositioner"
-                sourceDirName="\\qlen\SoftPile\qort\Projects\depoQORT\Last Versions x64\srvPositioner\"
-                targetSourceDir="\\qsoft4\usr\depoQort\srvComponents\srvPositioner\"/>
+                serviceName="2GISUpdateService"
+                lastVersionDirName="D:\foldersource\srvPositioner\"
+                componentDirName="D:\foldertarget\srvPositioner\"/>
 
         <component
                 componentName="srvReporter"
-                serviceName="depoQort_srvReporter"
-                sourceDirName="\\qlen\SoftPile\qort\Projects\depoQORT\Last Versions x64\srvReporter\"
-                targetSourceDir="\\qsoft4\usr\depoQort\srvComponents\srvReporter\"/>
+                serviceName="2GISUpdateService"
+                lastVersionDirName="D:\foldersource\srvReporter\"
+                componentDirName="D:\foldertarget\srvReporter\"/>
 
         <component
                 componentName="srvTDB"
-                serviceName="depoQort_srvTDB"
-                sourceDirName="\\qlen\SoftPile\qort\Projects\depoQORT\Last Versions x64\srvTDB\"
-                targetSourceDir="\\qsoft4\usr\depoQort\srvComponents\srvTDB\"/>
+                serviceName="2GISUpdateService"
+                lastVersionDirName="D:\foldersource\srvTDB\"
+                componentDirName="D:\foldertarget\srvTDB\"/>
     </project>
 </config>

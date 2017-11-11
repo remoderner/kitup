@@ -3,8 +3,8 @@ package classroom;
 public class Component {
     private String componentName;
     private String serviceName;
-    private String sourceDirName;
-    private String targetSourceDir;
+    private String lastVersionDirName;
+    private String componentDirName;
 
     public String getComponentName() {
         return componentName;
@@ -22,20 +22,21 @@ public class Component {
         this.serviceName = serviceName;
     }
 
-    public String getSourceDirName() {
-        return sourceDirName;
+    public String getLastVersionDirName() {
+        return lastVersionDirName;
     }
 
-    public void setSourceDirName(String sourceDirName) {
-        this.sourceDirName = sourceDirName;
+    public void setLastVersionDirName(String sourceDirName) {
+        this.lastVersionDirName = sourceDirName;
     }
 
-    public String getTargetSourceDir() {
-        return targetSourceDir;
+    public String getComponentDirName() {
+        return componentDirName;
     }
 
-    public void setTargetSourceDir(String targetSourceDir) {
-        this.targetSourceDir = targetSourceDir;
+    public void setComponentDirName(String targetSourceDir) {
+        this.componentDirName = targetSourceDir;
     }
+
 }
 

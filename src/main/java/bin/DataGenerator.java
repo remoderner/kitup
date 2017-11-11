@@ -27,7 +27,7 @@ class DataGenerator {
         String filePath = new File("").getAbsolutePath(); //Получить путь к текущему каталогу
 
         try {
-            File xmlFile = new File(filePath.concat("/src/main/java/bin/" + configFileName));
+            File xmlFile = new File(filePath.concat("//src/main/java/bin/" + configFileName)); ///src/main/java/bin/
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(xmlFile);
@@ -45,6 +45,7 @@ class DataGenerator {
                     Element eProject = (Element) nProject;
                     project.setProjectName(eProject.getAttribute("projectName"));
                     project.setServerName(eProject.getAttribute("serverName"));
+                    project.setSalesDirName(eProject.getAttribute("salesDirName"));
                 }
 
                 for (int x = 0; x < componentList.getLength(); x++) { //Чтение и запись данных по компонентам проекта
@@ -55,8 +56,8 @@ class DataGenerator {
                         Element eComponent = (Element) nComponent;
                         component.setComponentName(eComponent.getAttribute("componentName"));
                         component.setServiceName(eComponent.getAttribute("serviceName"));
-                        component.setSourceDirName(eComponent.getAttribute("sourceDirName"));
-                        component.setTargetSourceDir(eComponent.getAttribute("targetSourceDir"));
+                        component.setLastVersionDirName(eComponent.getAttribute("lastVersionDirName"));
+                        component.setComponentDirName(eComponent.getAttribute("componentDirName"));
                         project.setComponents(component);
                     }
                 }

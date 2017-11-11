@@ -5,6 +5,7 @@ import java.util.ArrayList;
 public class Project {
     private String projectName;
     private String serverName;
+    private String salesDirName;
     private ArrayList<Component> components = new ArrayList<>();
 
     public String getProjectName() {
@@ -21,6 +22,14 @@ public class Project {
 
     public void setServerName(String serverName) {
         this.serverName = serverName;
+    }
+
+    public String getSalesDirName() {
+        return salesDirName;
+    }
+
+    public void setSalesDirName(String pathPastVersion) {
+        this.salesDirName = pathPastVersion;
     }
 
     public ArrayList<Component> getComponents() {
