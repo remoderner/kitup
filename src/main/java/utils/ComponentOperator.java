@@ -7,14 +7,12 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static java.util.Collections.reverseOrder;
 
 public class ComponentOperator {
-    private static Logger log = Logger.getLogger(ComponentOperator.class.getName());
     private FileInformator fileInformator;
 
     public ComponentOperator() {
@@ -48,7 +46,7 @@ public class ComponentOperator {
      * RESTART Component
      */
     public void restartComponent(String pathServer, String serviceName) {
-        log.info("Run restartComponent");
+        System.out.println("Run restartComponent");
         stopComponent(pathServer, serviceName);
         checkServiceStop(pathServer, serviceName);
         startComponent(pathServer, serviceName);
@@ -58,9 +56,8 @@ public class ComponentOperator {
      * START Component
      */
     public void startComponent(String pathServer, String serviceName) { //Запуск компоненты
-        log.info("Run startComponent");
+        System.out.println("Run startComponent");
         System.out.println(pathServer + " " + serviceName);
-        log.info(pathServer + " " + serviceName);
         cmdRun(pathServer, serviceName, " start ");
     }
 
@@ -68,9 +65,8 @@ public class ComponentOperator {
      * STOP Component
      */
     public void stopComponent(String pathServer, String serviceName) { //Остановка компоненты
-        log.info("Run stopComponent");
+        System.out.println("Run stopComponent");
         System.out.println(pathServer + " " + serviceName);
-        log.info(pathServer + " " + serviceName);
         cmdRun(pathServer, serviceName, " stop ");
     }
 
@@ -79,7 +75,7 @@ public class ComponentOperator {
      */
     public void rollbackComponent(String pathServer, String serviceName, String pathComponent, String pathPastVersion) {
         FileCopyer copyFiles = new FileCopyer();
-        log.info("Run rollbackComponent");
+        System.out.println("Run rollbackComponent");
 
         stopComponent(pathServer, serviceName);
         checkServiceStop(pathServer, serviceName);
@@ -107,7 +103,6 @@ public class ComponentOperator {
             String line;
             for (line = reader.readLine(); line != null; line = reader.readLine()) { //Выводим ответ с консоли
                 System.out.println(line);
-                log.info(line);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -128,13 +123,10 @@ public class ComponentOperator {
                 String line = reader.readLine();
                 if (line == null) { //Если служба не остановлена
                     System.out.println("Wait stoping service " + serviceName + "....");
-                    log.info("Wait stoping service " + serviceName + "....");
                     Thread.sleep(2000);
                 } else { //Если служба остановлена
                     System.out.println(line);
-                    log.info(line);
                     System.out.println("....Service " + serviceName + " is stoped");
-                    log.info("....Service " + serviceName + " is stoped");
                     break;
                 }
 
@@ -175,9 +167,7 @@ public class ComponentOperator {
 
         Pattern p = Pattern.compile("[0-9]+");
         System.out.println("Get rollback dates....");
-        log.info("Get rollback dates....");
         System.out.println(pathLastVersion);
-        log.info(pathLastVersion);
 
         if (listOfFiles != null) {
             int i = 0;
@@ -187,7 +177,6 @@ public class ComponentOperator {
                     Matcher m_ = p.matcher(s_);
                     if (m_.matches()) {
                         System.out.println(s_);
-                        log.info(s_);
                         i++;
                         rollbackDateButtonList.add(s_);
                     }
@@ -197,7 +186,6 @@ public class ComponentOperator {
                     if (m.matches()) {
                         i++;
                         System.out.println(s);
-                        log.info(s);
                         rollbackDateButtonList.add(s);
                     }
                 }
@@ -220,16 +208,13 @@ public class ComponentOperator {
         File folder = new File(pathSales);
         File[] listOfFiles = folder.listFiles(File::isDirectory);
         System.out.println("Get rollback path....");
-        log.info("Get rollback path....");
         System.out.println(pathSales);
-        log.info(pathSales);
 
         if (listOfFiles != null) {
             for (File file : listOfFiles) {
                 System.out.println(file.getName());
                 if (file.getName().contains("Full_" + rollbackDate)) {
                     System.out.println("Подходящая папка найдена: " + file.getName());
-                    log.info("Подходящая папка найдена: " + file.getName());
                     return file.getName();
                 }
             }

@@ -14,10 +14,8 @@ import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.Objects;
-import java.util.logging.Logger;
 
 public class OptionListController {
-    private static Logger log = Logger.getLogger(OptionListController.class.getName());
 
     @FXML
     private Button update;
@@ -216,7 +214,6 @@ public class OptionListController {
                             }
                             String pathPastVersion = pathSales + pastFolder + "\\" + "SrvComp" + "\\" + componentName;
                             System.out.println("Путь к откату: " + pathPastVersion);
-                            log.info("Путь к откату: " + pathPastVersion);
                             Button button = new Button();
                             button.setText(entry);
                             button.setPrefWidth(108);
