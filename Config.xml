@@ -7,127 +7,127 @@
                 lastVersionDirName="D:\foldersource\"
                 componentDirName="D:\foldertarget\"/>
         <component
-                componentName="srvCBonds"
+                componentName="srvTest2"
                 serviceName="2GISUpdateService"
-                lastVersionDirName="D:\foldersource\srvCBonds\"
-                componentDirName="D:\foldertarget\srvCBonds\"/>
+                lastVersionDirName="D:\foldersource\srvTest2\"
+                componentDirName="D:\foldertarget\srvTest2\"/>
         <component
-                componentName="srvCommissioner"
+                componentName="srvTest3"
                 serviceName="2GISUpdateService"
-                lastVersionDirName="D:\foldersource\srvCommissioner\"
-                componentDirName="D:\foldertarget\srvCommissioner\"/>
+                lastVersionDirName="D:\foldersource\srvTest3\"
+                componentDirName="D:\foldertarget\srvTest3\"/>
         <component
-                componentName="srvController"
+                componentName="srvTest4"
                 serviceName="2GISUpdateService"
-                lastVersionDirName="D:\foldersource\srvController\"
-                componentDirName="D:\foldertarget\srvController\"/>
+                lastVersionDirName="D:\foldersource\srvTest4\"
+                componentDirName="D:\foldertarget\srvTest4\"/>
         <component
-                componentName="srvDocMaker"
+                componentName="srvTest5"
                 serviceName="2GISUpdateService"
-                lastVersionDirName="D:\foldersource\srvDocMaker\"
-                componentDirName="D:\foldertarget\srvDocMaker\"/>
+                lastVersionDirName="D:\foldersource\srvTest5\"
+                componentDirName="D:\foldertarget\srvTest5\"/>
         <component
-                componentName="srvEfir"
+                componentName="srvTest6"
                 serviceName="2GISUpdateService"
-                lastVersionDirName="D:\foldersource\srvEfir\"
-                componentDirName="D:\foldertarget\srvEfir\"/>
+                lastVersionDirName="D:\foldersource\srvTest6\"
+                componentDirName="D:\foldertarget\srvTest6\"/>
         <component
-                componentName="srvInformer"
+                componentName="srvTest7"
                 serviceName="2GISUpdateService"
-                lastVersionDirName="D:\foldersource\srvInformer\"
-                componentDirName="D:\foldertarget\srvInformer\"/>
+                lastVersionDirName="D:\foldersource\srvTest7\"
+                componentDirName="D:\foldertarget\srvTest7\"/>
         <component
-                componentName="srvMessenger"
+                componentName="srvTest8"
                 serviceName="2GISUpdateService"
-                lastVersionDirName="D:\foldersource\srvMessenger\"
-                componentDirName="D:\foldertarget\srvMessenger\"/>
+                lastVersionDirName="D:\foldersource\srvTest8\"
+                componentDirName="D:\foldertarget\srvTest8\"/>
         <component
-                componentName="srvNSDDisk"
+                componentName="srvTest9"
                 serviceName="2GISUpdateService"
-                lastVersionDirName="D:\foldersource\srvNSDDisk\"
-                componentDirName="D:\foldertarget\srvNSDDisk\"/>
+                lastVersionDirName="D:\foldersource\srvTest9\"
+                componentDirName="D:\foldertarget\srvTest9\"/>
         <component
-                componentName="srvOTCReporter"
+                componentName="srvTest10"
                 serviceName="2GISUpdateService"
-                lastVersionDirName="D:\foldersource\srvOTCReporter\"
-                componentDirName="D:\foldertarget\srvOTCReporter\"/>
+                lastVersionDirName="D:\foldersource\srvTest10\"
+                componentDirName="D:\foldertarget\srvTest10\"/>
         <component
-                componentName="srvPositioner"
+                componentName="srvTest11"
                 serviceName="2GISUpdateService"
-                lastVersionDirName="D:\foldersource\srvPositioner\"
-                componentDirName="D:\foldertarget\srvPositioner\"/>
+                lastVersionDirName="D:\foldersource\srvTest11\"
+                componentDirName="D:\foldertarget\srvTest11\"/>
         <component
-                componentName="srvQ2DEPO"
+                componentName="srvTest12"
                 serviceName="2GISUpdateService"
-                lastVersionDirName="D:\foldersource\srvQ2DEPO\"
-                componentDirName="D:\foldertarget\srvQ2DEPO\"/>
+                lastVersionDirName="D:\foldersource\srvTest12\"
+                componentDirName="D:\foldertarget\srvTest12\"/>
         <component
-                componentName="srvQ2Q"
+                componentName="srvTest13"
                 serviceName="2GISUpdateService"
-                lastVersionDirName="D:\foldersource\srvQ2Q\"
-                componentDirName="D:\foldertarget\srvQ2Q\"/>
+                lastVersionDirName="D:\foldersource\srvTest13\"
+                componentDirName="D:\foldertarget\srvTest13\"/>
         <component
-                componentName="srvQUIK"
+                componentName="srvTest14"
                 serviceName="Uralsib_srvQUIK"
-                lastVersionDirName="D:\foldersource\srvQUIK\"
-                componentDirName="D:\foldertarget\srvQUIK\"/>
+                lastVersionDirName="D:\foldersource\srvTest14\"
+                componentDirName="D:\foldertarget\srvTest14\"/>
         <component
-                componentName="srvReporter"
+                componentName="srvTest15"
                 serviceName="2GISUpdateService"
-                lastVersionDirName="D:\foldersource\srvReporter\"
-                componentDirName="D:\foldertarget\srvReporter\"/>
+                lastVersionDirName="D:\foldersource\srvTest15\"
+                componentDirName="D:\foldertarget\srvTest15\"/>
         <component
-                componentName="srvRisks"
+                componentName="srvTest16"
                 serviceName="Uralsib_srvRisks"
-                lastVersionDirName="D:\foldersource\srvRisks\"
-                componentDirName="D:\foldertarget\srvRisks\"/>
+                lastVersionDirName="D:\foldersource\srvTest16\"
+                componentDirName="D:\foldertarget\srvTest16\"/>
         <component
-                componentName="srvScheduler"
+                componentName="srvTest17"
                 serviceName="2GISUpdateService"
-                lastVersionDirName="D:\foldersource\srvScheduler\"
-                componentDirName="D:\foldertarget\srvScheduler\"/>
+                lastVersionDirName="D:\foldersource\srvTest17\"
+                componentDirName="D:\foldertarget\srvTest17\"/>
         <component
-                componentName="srvTDB"
+                componentName="srvTest18"
                 serviceName="2GISUpdateService"
-                lastVersionDirName="D:\foldersource\srvTDB\"
-                componentDirName="D:\foldertarget\srvTDB\"/>
+                lastVersionDirName="D:\foldersource\srvTest18\"
+                componentDirName="D:\foldertarget\srvTest18\"/>
     </project>
 
     <project projectName="mid" serverName="\\qsoft4\">
         <component
-                componentName="srvCBonds"
+                componentName="srvTest"
                 serviceName="OPEN_srvCBonds"
-                lastVersionDirName="D:\foldersource\srvCBonds\"
-                componentDirName="D:\foldertarget\srvCBonds\"/>
+                lastVersionDirName="D:\foldersource\srvTest\"
+                componentDirName="D:\foldertarget\srvTest\"/>
         <component
-                componentName="srvPositioner"
+                componentName="srvTest2"
                 serviceName="2GISUpdateService"
-                lastVersionDirName="D:\foldersource\srvPositioner\"
-                componentDirName="D:\foldertarget\srvPositioner\"/>
+                lastVersionDirName="D:\foldersource\srvTest2\"
+                componentDirName="D:\foldertarget\srvTest2\"/>
         <component
-                componentName="srvReporter"
+                componentName="srvTest3"
                 serviceName="2GISUpdateService"
-                lastVersionDirName="D:\foldersource\srvReporter\"
-                componentDirName="D:\foldertarget\srvReporter\"/>
+                lastVersionDirName="D:\foldersource\srvTest3\"
+                componentDirName="D:\foldertarget\srvTest3\"/>
         <component
-                componentName="srvTDB"
+                componentName="srvTest4"
                 serviceName="2GISUpdateService"
-                lastVersionDirName="D:\foldersource\srvTDB\"
-                componentDirName="D:\foldertarget\srvTDB\"/>
+                lastVersionDirName="D:\foldersource\srvTest4\"
+                componentDirName="D:\foldertarget\srvTest4\"/>
     </project>
 
     <project projectName="cap" serverName="\\qsoft2\">
         <component
-                componentName="srvCBonds"
+                componentName="srvTest"
                 serviceName="2GISUpdateService"
-                lastVersionDirName="D:\foldersource\srvCBonds\"
-                componentDirName="D:\foldertarget\srvCBonds\"/>
+                lastVersionDirName="D:\foldersource\srvTest\"
+                componentDirName="D:\foldertarget\srvTest\"/>
 
         <component
-                componentName="srvCommissioner"
+                componentName="srvTest2"
                 serviceName="2GISUpdateService"
-                lastVersionDirName="D:\foldersource\srvCommissioner\"
-                componentDirName="D:\foldertarget\srvCommissioner\"/>
+                lastVersionDirName="D:\foldersource\srvTest2\"
+                componentDirName="D:\foldertarget\srvTest2\"/>
     </project>
 
     <project projectName="crm" serverName="\\qsoft3\">
@@ -136,39 +136,39 @@
 
     <project projectName="depo" serverName="\\qsoft4\">
         <component
-                componentName="srvCorpNSD"
+                componentName="srvTest"
                 serviceName="2GISUpdateService"
-                lastVersionDirName="D:\foldersource\srvCorpNSD\"
-                componentDirName="D:\foldertarget\srvCorpNSD\"/>
+                lastVersionDirName="D:\foldersource\srvTest\"
+                componentDirName="D:\foldertarget\srvTest\"/>
 
         <component
-                componentName="srvDocMaker"
+                componentName="srvTest2"
                 serviceName="depoQort_srvDocMaker"
-                lastVersionDirName="D:\foldersource\srvDocMaker\"
-                componentDirName="D:\foldertarget\srvDocMaker\"/>
+                lastVersionDirName="D:\foldersource\srvTest2\"
+                componentDirName="D:\foldertarget\srvTest2\"/>
 
         <component
-                componentName="srvOperator"
+                componentName="srvTest3"
                 serviceName="2GISUpdateService"
-                lastVersionDirName="D:\foldersource\srvOperator\"
-                componentDirName="D:\foldertarget\srvOperator\"/>
+                lastVersionDirName="D:\foldersource\srvTest3\"
+                componentDirName="D:\foldertarget\srvTest3\"/>
 
         <component
-                componentName="srvPositioner"
+                componentName="srvTest4"
                 serviceName="2GISUpdateService"
-                lastVersionDirName="D:\foldersource\srvPositioner\"
-                componentDirName="D:\foldertarget\srvPositioner\"/>
+                lastVersionDirName="D:\foldersource\srvTest4\"
+                componentDirName="D:\foldertarget\srvTest4\"/>
 
         <component
-                componentName="srvReporter"
+                componentName="srvTest5"
                 serviceName="2GISUpdateService"
-                lastVersionDirName="D:\foldersource\srvReporter\"
-                componentDirName="D:\foldertarget\srvReporter\"/>
+                lastVersionDirName="D:\foldersource\srvTest5\"
+                componentDirName="D:\foldertarget\srvTest5\"/>
 
         <component
-                componentName="srvTDB"
+                componentName="srvTest6"
                 serviceName="2GISUpdateService"
-                lastVersionDirName="D:\foldersource\srvTDB\"
-                componentDirName="D:\foldertarget\srvTDB\"/>
+                lastVersionDirName="D:\foldersource\srvTest6\"
+                componentDirName="D:\foldertarget\srvTest6\"/>
     </project>
 </config>

@@ -15,8 +15,7 @@ import java.io.File;
 class FileInformator {
     private static final Logger log = LogManager.getLogger(FileInformator.class);
     String getFileVersion(String pathname, String infoType) {
-        log.info("getFileVersion"
-                + "pathname: " + pathname
+        log.info("pathname: " + pathname + " | "
                 + "infoType: " + infoType);
         return readFileInfo(pathname, infoType);
     }
