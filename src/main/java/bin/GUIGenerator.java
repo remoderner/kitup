@@ -19,6 +19,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import utils.ComponentOperator;
+import utils.FileOpener;
 import view.OptionListController;
 
 import java.io.IOException;
@@ -27,6 +28,7 @@ import java.util.HashSet;
 
 public class GUIGenerator extends Application {
     private DataGenerator dataGenerator = new DataGenerator("Config.xml");
+    private FileOpener fileOpener = new FileOpener();
     private ComponentOperator componentOperator = new ComponentOperator();
     private Stage primaryStage;
     private BorderPane rootLayout;
@@ -213,6 +215,7 @@ public class GUIGenerator extends Application {
             // Передача настройки в контроллер
             OptionListController controller = loader.getController();
             controller.setGuiGenerator(this, dialogStage);
+            controller.setFileOpener(fileOpener);
             controller.setComponentData(project, component);
 
             dialogStage.show();
