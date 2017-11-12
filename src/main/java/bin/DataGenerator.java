@@ -33,7 +33,6 @@ class DataGenerator {
             Document doc = dBuilder.parse(xmlFile);
 
             doc.getDocumentElement().normalize();
-
             NodeList projectList = doc.getElementsByTagName("project");
 
             for (int i = 0; i < projectList.getLength(); i++) { //Чтение и запись данных по проектам

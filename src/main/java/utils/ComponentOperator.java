@@ -32,11 +32,10 @@ public class ComponentOperator {
      * @param pathComponent   - Путь к папке с компонентой
      */
     public void updateComponent(String pathServer, String serviceName, String pathLastVersion, String pathComponent) { //Рестарт + обновление компоненты
-        log.info("Run updateComponent"
-                + "\npathServer: " + pathServer
-                + "\nserviceName: " + serviceName
-                + "\npathLastVersion " + pathLastVersion
-                + "\npathComponent: " + pathComponent);
+        log.info("pathServer: " + pathServer + " | "
+                + "serviceName: " + serviceName + " | "
+                + "pathLastVersion " + pathLastVersion + " | "
+                + "pathComponent: " + pathComponent);
         FileCopyer copyFiles = new FileCopyer();
 
         stopComponent(pathServer, serviceName);
@@ -54,9 +53,8 @@ public class ComponentOperator {
      * RESTART Component
      */
     public void restartComponent(String pathServer, String serviceName) {
-        log.info("Run restartComponent"
-                + "\npathServer: " + pathServer
-                + "\nserviceName: " + serviceName);
+        log.info("pathServer: " + pathServer + " | "
+                + "serviceName: " + serviceName);
         stopComponent(pathServer, serviceName);
         checkServiceStop(pathServer, serviceName);
         startComponent(pathServer, serviceName);
@@ -66,9 +64,8 @@ public class ComponentOperator {
      * START Component
      */
     public void startComponent(String pathServer, String serviceName) { //Запуск компоненты
-        log.info("Run startComponent"
-                + "\npathServer: " + pathServer
-                + "\nserviceName: " + serviceName);
+        log.info("pathServer: " + pathServer + " | "
+                + "serviceName: " + serviceName);
         cmdRun(pathServer, serviceName, " start ");
     }
 
@@ -76,9 +73,8 @@ public class ComponentOperator {
      * STOP Component
      */
     public void stopComponent(String pathServer, String serviceName) { //Остановка компоненты
-        log.info("Run stopComponent"
-                + "\npathServer: " + pathServer
-                + "\nserviceName " + serviceName);
+        log.info("pathServer: " + pathServer + " | "
+                + "serviceName " + serviceName);
         cmdRun(pathServer, serviceName, " stop ");
     }
 
@@ -86,11 +82,10 @@ public class ComponentOperator {
      * ROLLBACK Component
      */
     public void rollbackComponent(String pathServer, String serviceName, String pathComponent, String pathPastVersion) {
-        log.info("Run rollbackComponent"
-                + "\npathServer: " + pathServer
-                + "\nserviceName: " + serviceName
-                + "\npathComponent: " + pathComponent
-                + "\npathPastVersion: " + pathPastVersion);
+        log.info("pathServer: " + pathServer + " | "
+                + "serviceName: " + serviceName + " | "
+                + "pathComponent: " + pathComponent + " | "
+                + "pathPastVersion: " + pathPastVersion);
         FileCopyer copyFiles = new FileCopyer();
 
         stopComponent(pathServer, serviceName);
@@ -110,7 +105,7 @@ public class ComponentOperator {
      * @param action - Действие (start, stop)
      */
     private void cmdRun(String pathServer, String serviceName, String action) { //Запуск команды в консоль
-        log.info("Run cmdRun");
+        log.info("cmd.exe: " + "/c " + "sc " + pathServer + action + serviceName);
         try {
             ProcessBuilder builder = new ProcessBuilder(
                     "cmd.exe", "/c", "sc " + pathServer + action + serviceName);
@@ -122,7 +117,7 @@ public class ComponentOperator {
                 log.info(line);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.warn("Error: " + e.toString());
         }
     }
 
@@ -131,6 +126,7 @@ public class ComponentOperator {
      * Запрос состояния службы (ожидание остановки)
      */
     private void checkServiceStop(String pathServer, String serviceName) {
+        log.info("cmd.exe: " + "/c " + "sc " + pathServer + " query " + serviceName + " | find \"STOPPED\"");
         try {
             for (int i = 0; ; i++) { // Запрашиваем состояние службы
                 ProcessBuilder builder = new ProcessBuilder(
@@ -153,7 +149,7 @@ public class ComponentOperator {
                 }
             }
         } catch (IOException | InterruptedException e) {
-            log.warn("Error check service :" + e.toString());
+            log.warn("Error: " + e.toString());
         }
     }
 
@@ -161,7 +157,6 @@ public class ComponentOperator {
      * GET COMPONENT VERSION
      */
     public String getComponentVersion(String componentName, String pathComponent, String infoType) {
-        log.info("Run getComponentVersion");
         String fileVersion = fileInformator.getFileVersion(pathComponent + componentName, infoType);
         log.info(componentName + ": " + fileVersion);
         return fileVersion;
@@ -174,7 +169,6 @@ public class ComponentOperator {
      * @return rollbackDateButtonList
      */
     public ArrayList<String> getRollbackDates(String pathLastVersion) {
-        log.info("Run getRollbackDates");
         ArrayList<String> rollbackDateButtonList = new ArrayList<>();
         File folder = new File(pathLastVersion);
         File[] listOfFiles = folder.listFiles(File::isDirectory);
@@ -224,7 +218,6 @@ public class ComponentOperator {
      * @return file.getName();
      */
     public String getPathPastVersion(String pathSales, String rollbackDate) {
-        log.info("Run getPathPastVersion");
         File folder = new File(pathSales);
         File[] listOfFiles = folder.listFiles(File::isDirectory);
         log.info("Get rollback path....");

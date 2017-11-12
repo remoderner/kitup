@@ -16,7 +16,6 @@ class FileCopyer {
     }
 
     void copyFiles(String lastversionDirName, String componentDirName) { //Копирование файлов из одной дериктории в другую
-
         File folder = new File(lastversionDirName);
         File[] listOfFiles = folder.listFiles(File::isFile);
         Path destDir = Paths.get(componentDirName);
@@ -24,8 +23,8 @@ class FileCopyer {
 
         if (listOfFiles != null) {
             for (File file : listOfFiles) {
-                log.info(file.getName());
                 if (!file.getName().endsWith(".ini")) { //Только файлы, т.е. не копируем папки
+                    log.info(file.getName());
                     try {
                         Files.copy(file.toPath(), destDir.resolve(file.getName()), StandardCopyOption.REPLACE_EXISTING);
                     } catch (IOException e) {

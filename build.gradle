@@ -1,5 +1,5 @@
 group 'jarjar'
-version '1.4.1'
+version '1.4.3'
 
 apply plugin: 'java'
 
@@ -10,10 +10,17 @@ jar {
     manifest {
         attributes 'Main-Class': 'Main'
     }
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
 }
 
 repositories {
     mavenCentral()
+}
+
+configurations {
+    compile
 }
 
 dependencies {
