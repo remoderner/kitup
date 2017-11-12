@@ -1,5 +1,8 @@
 package utils;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +16,7 @@ import java.util.regex.Pattern;
 import static java.util.Collections.reverseOrder;
 
 public class ComponentOperator {
+    private static final Logger log = LogManager.getLogger(ComponentOperator.class);
     private FileInformator fileInformator;
 
     public ComponentOperator() {
@@ -28,8 +32,12 @@ public class ComponentOperator {
      * @param pathComponent   - Путь к папке с компонентой
      */
     public void updateComponent(String pathServer, String serviceName, String pathLastVersion, String pathComponent) { //Рестарт + обновление компоненты
+        log.info("Run updateComponent"
+                + "\npathServer: " + pathServer
+                + "\nserviceName: " + serviceName
+                + "\npathLastVersion " + pathLastVersion
+                + "\npathComponent: " + pathComponent);
         FileCopyer copyFiles = new FileCopyer();
-        System.out.println("Run updateComponent");
 
         stopComponent(pathServer, serviceName);
         checkServiceStop(pathServer, serviceName);
@@ -46,7 +54,9 @@ public class ComponentOperator {
      * RESTART Component
      */
     public void restartComponent(String pathServer, String serviceName) {
-        System.out.println("Run restartComponent");
+        log.info("Run restartComponent"
+                + "\npathServer: " + pathServer
+                + "\nserviceName: " + serviceName);
         stopComponent(pathServer, serviceName);
         checkServiceStop(pathServer, serviceName);
         startComponent(pathServer, serviceName);
@@ -56,8 +66,9 @@ public class ComponentOperator {
      * START Component
      */
     public void startComponent(String pathServer, String serviceName) { //Запуск компоненты
-        System.out.println("Run startComponent");
-        System.out.println(pathServer + " " + serviceName);
+        log.info("Run startComponent"
+                + "\npathServer: " + pathServer
+                + "\nserviceName: " + serviceName);
         cmdRun(pathServer, serviceName, " start ");
     }
 
@@ -65,8 +76,9 @@ public class ComponentOperator {
      * STOP Component
      */
     public void stopComponent(String pathServer, String serviceName) { //Остановка компоненты
-        System.out.println("Run stopComponent");
-        System.out.println(pathServer + " " + serviceName);
+        log.info("Run stopComponent"
+                + "\npathServer: " + pathServer
+                + "\nserviceName " + serviceName);
         cmdRun(pathServer, serviceName, " stop ");
     }
 
@@ -74,8 +86,12 @@ public class ComponentOperator {
      * ROLLBACK Component
      */
     public void rollbackComponent(String pathServer, String serviceName, String pathComponent, String pathPastVersion) {
+        log.info("Run rollbackComponent"
+                + "\npathServer: " + pathServer
+                + "\nserviceName: " + serviceName
+                + "\npathComponent: " + pathComponent
+                + "\npathPastVersion: " + pathPastVersion);
         FileCopyer copyFiles = new FileCopyer();
-        System.out.println("Run rollbackComponent");
 
         stopComponent(pathServer, serviceName);
         checkServiceStop(pathServer, serviceName);
@@ -94,6 +110,7 @@ public class ComponentOperator {
      * @param action - Действие (start, stop)
      */
     private void cmdRun(String pathServer, String serviceName, String action) { //Запуск команды в консоль
+        log.info("Run cmdRun");
         try {
             ProcessBuilder builder = new ProcessBuilder(
                     "cmd.exe", "/c", "sc " + pathServer + action + serviceName);
@@ -102,7 +119,7 @@ public class ComponentOperator {
             BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream(), "CP866")); //Кодировка CP866 т.к. ее для вывода исторически использует консоль
             String line;
             for (line = reader.readLine(); line != null; line = reader.readLine()) { //Выводим ответ с консоли
-                System.out.println(line);
+                log.info(line);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -122,11 +139,11 @@ public class ComponentOperator {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream(), "CP866"));
                 String line = reader.readLine();
                 if (line == null) { //Если служба не остановлена
-                    System.out.println("Wait stoping service " + serviceName + "....");
+                    log.info("Wait stoping service " + serviceName + "....");
                     Thread.sleep(2000);
                 } else { //Если служба остановлена
-                    System.out.println(line);
-                    System.out.println("....Service " + serviceName + " is stoped");
+                    log.info(line);
+                    log.info("....Service " + serviceName + " is stoped");
                     break;
                 }
 
@@ -136,7 +153,7 @@ public class ComponentOperator {
                 }
             }
         } catch (IOException | InterruptedException e) {
-            System.err.println("Error check service :" + e.toString());
+            log.warn("Error check service :" + e.toString());
         }
     }
 
@@ -144,8 +161,9 @@ public class ComponentOperator {
      * GET COMPONENT VERSION
      */
     public String getComponentVersion(String componentName, String pathComponent, String infoType) {
+        log.info("Run getComponentVersion");
         String fileVersion = fileInformator.getFileVersion(pathComponent + componentName, infoType);
-        System.out.println(fileVersion);
+        log.info(componentName + ": " + fileVersion);
         return fileVersion;
     }
 
@@ -156,6 +174,7 @@ public class ComponentOperator {
      * @return rollbackDateButtonList
      */
     public ArrayList<String> getRollbackDates(String pathLastVersion) {
+        log.info("Run getRollbackDates");
         ArrayList<String> rollbackDateButtonList = new ArrayList<>();
         File folder = new File(pathLastVersion);
         File[] listOfFiles = folder.listFiles(File::isDirectory);
@@ -166,8 +185,8 @@ public class ComponentOperator {
         }
 
         Pattern p = Pattern.compile("[0-9]+");
-        System.out.println("Get rollback dates....");
-        System.out.println(pathLastVersion);
+        log.info("Get rollback dates....");
+        log.info(pathLastVersion);
 
         if (listOfFiles != null) {
             int i = 0;
@@ -176,7 +195,7 @@ public class ComponentOperator {
                     String s_ = file.getName().substring(0, (file.getName().lastIndexOf("_")));
                     Matcher m_ = p.matcher(s_);
                     if (m_.matches()) {
-                        System.out.println(s_);
+                        log.info(s_);
                         i++;
                         rollbackDateButtonList.add(s_);
                     }
@@ -185,7 +204,7 @@ public class ComponentOperator {
                     Matcher m = p.matcher(s);
                     if (m.matches()) {
                         i++;
-                        System.out.println(s);
+                        log.info(s);
                         rollbackDateButtonList.add(s);
                     }
                 }
@@ -204,17 +223,18 @@ public class ComponentOperator {
      * @param rollbackDate - Дата отката
      * @return file.getName();
      */
-    public String GetPathPastVersion(String pathSales, String rollbackDate) {
+    public String getPathPastVersion(String pathSales, String rollbackDate) {
+        log.info("Run getPathPastVersion");
         File folder = new File(pathSales);
         File[] listOfFiles = folder.listFiles(File::isDirectory);
-        System.out.println("Get rollback path....");
-        System.out.println(pathSales);
+        log.info("Get rollback path....");
+        log.info(pathSales);
 
         if (listOfFiles != null) {
             for (File file : listOfFiles) {
-                System.out.println(file.getName());
+                log.info(file.getName());
                 if (file.getName().contains("Full_" + rollbackDate)) {
-                    System.out.println("Подходящая папка найдена: " + file.getName());
+                    log.info("Подходящая папка найдена: " + file.getName());
                     return file.getName();
                 }
             }

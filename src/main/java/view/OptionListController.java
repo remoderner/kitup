@@ -208,7 +208,7 @@ public class OptionListController {
                     protected Void call() {
                         ArrayList<Button> rollbackDateButtonList = new ArrayList<>();
                         for (String entry : guiGenerator.getComponentOperator().getRollbackDates(pathLastVersion)) {
-                            String pastFolder = guiGenerator.getComponentOperator().GetPathPastVersion(pathSales, entry);
+                            String pastFolder = guiGenerator.getComponentOperator().getPathPastVersion(pathSales, entry);
                             if (pastFolder == null) { //Если папки с откатом не найдено, то не добавляем кнопку
                                 continue;
                             }

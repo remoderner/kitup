@@ -7,13 +7,17 @@ import com.sun.jna.platform.win32.Version;
 import com.sun.jna.platform.win32.WinBase;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 
 class FileInformator {
+    private static final Logger log = LogManager.getLogger(FileInformator.class);
     String getFileVersion(String pathname, String infoType) {
-        System.out.println("pathname: " + pathname);
-        System.out.println("infoType: " + infoType);
+        log.info("getFileVersion"
+                + "pathname: " + pathname
+                + "infoType: " + infoType);
         return readFileInfo(pathname, infoType);
     }
 
