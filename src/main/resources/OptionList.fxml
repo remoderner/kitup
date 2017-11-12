@@ -12,6 +12,11 @@
         <Button fx:id="restart" onAction="#restartComponent" prefWidth="150" text="Restart"/>
         <Button fx:id="start" onAction="#startComponent" prefWidth="150" text="Start"/>
         <Button fx:id="stop" onAction="#stopComponent" prefWidth="150" text="Stop"/>
+        <HBox alignment="CENTER" spacing="10">
+            <Button fx:id="ini" onAction="#openIni" text="ini"/>
+            <Button fx:id="log" onAction="#openLog" text="log"/>
+            <Button fx:id="dir" onAction="#openDir" text="dir"/>
+        </HBox>
         <TitledPane alignment="CENTER" animated="false" collapsible="false" text="Rollback">
             <graphic>
                 <Button fx:id="getRollbackDates" text="get" onAction="#getRollbackDates"/>

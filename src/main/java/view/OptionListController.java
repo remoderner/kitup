@@ -11,6 +11,7 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import utils.FileOpener;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -30,6 +31,15 @@ public class OptionListController {
     private Button stop;
 
     @FXML
+    private Button ini;
+
+    @FXML
+    private Button log;
+
+    @FXML
+    private Button dir;
+
+    @FXML
     private VBox rollbackDates;
 
     @FXML
@@ -47,6 +57,7 @@ public class OptionListController {
 
     private Stage dialogStage;
     private GUIGenerator guiGenerator; // Ссылка на главное приложение.
+    private FileOpener fileOpener;
 
     public OptionListController() {
     }
@@ -62,6 +73,10 @@ public class OptionListController {
     public void setGuiGenerator(GUIGenerator guiGenerator, Stage dialogStage) {
         this.guiGenerator = guiGenerator;
         this.dialogStage = dialogStage;
+    }
+
+    public void setFileOpener(FileOpener fileOpener) {
+        this.fileOpener = fileOpener;
     }
 
     public void setComponentData(Project project, Component component) {
@@ -83,7 +98,7 @@ public class OptionListController {
     }
 
     private void setRollbackDates(ArrayList<Button> rollbackDateButtonList) {
-        dialogStage.setHeight(293 + 37 * rollbackDateButtonList.size());
+        dialogStage.setHeight(330 + 37 * rollbackDateButtonList.size());
         rollbackDates.getChildren().addAll(rollbackDateButtonList);
     }
 
@@ -194,11 +209,80 @@ public class OptionListController {
     }
 
     /**
+     * INI
+     */
+    @FXML
+    private void openIni() {
+        Service backqroundThread = new Service<Void>() {
+            protected Task<Void> createTask() {
+                return new Task<>() {
+                    protected Void call() {
+                        String link = pathComponent + componentName + ".ini";
+                        fileOpener.openFile(link);
+                        return null;
+                    }
+                };
+            }
+        };
+
+        backqroundThread.setOnSucceeded(event -> ini.setDisable(false));
+
+        ini.setDisable(true);
+        backqroundThread.restart();
+    }
+
+    /**
+     * LOG
+     */
+    @FXML
+    private void openLog() {
+        Service backqroundThread = new Service<Void>() {
+            protected Task<Void> createTask() {
+                return new Task<>() {
+                    protected Void call() {
+                        String actualLogName = guiGenerator.getComponentOperator().getComponentLogName(componentName, pathComponent);
+                        String link = pathComponent + actualLogName;
+                        fileOpener.openFile(link);
+                        return null;
+                    }
+                };
+            }
+        };
+
+        backqroundThread.setOnSucceeded(event -> log.setDisable(false));
+
+        log.setDisable(true);
+        backqroundThread.restart();
+    }
+
+    /**
+     * DIR
+     */
+    @FXML
+    private void openDir() {
+        Service backqroundThread = new Service<Void>() {
+            protected Task<Void> createTask() {
+                return new Task<>() {
+                    protected Void call() {
+                        String link = pathComponent;
+                        fileOpener.openDir(link);
+                        return null;
+                    }
+                };
+            }
+        };
+
+        backqroundThread.setOnSucceeded(event -> dir.setDisable(false));
+
+        dir.setDisable(true);
+        backqroundThread.restart();
+    }
+
+    /**
      * Rollback ADD/UPDATE
      */
     @FXML
     private void getRollbackDates() {
-
         /*
          * Запуск создания кнопок для отката компоненты в отдельном потоке
          */

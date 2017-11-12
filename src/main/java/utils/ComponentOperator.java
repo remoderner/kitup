@@ -155,11 +155,39 @@ public class ComponentOperator {
 
     /**
      * GET COMPONENT VERSION
+     *
+     * Вернуть ссылка на актульный лог компоненты
      */
     public String getComponentVersion(String componentName, String pathComponent, String infoType) {
         String fileVersion = fileInformator.getFileVersion(pathComponent + componentName, infoType);
         log.info(componentName + ": " + fileVersion);
         return fileVersion;
+    }
+
+    /**
+     * GET COMPONENT LOG LINK
+     */
+    public String getComponentLogName(String componentName, String pathComponent) {
+        log.info("pathComponent: " + pathComponent);
+        File folder = new File(pathComponent);
+        File[] listOfFiles = folder.listFiles(File::isFile);
+
+        // Сортировка названий папок по убыванию
+        if (listOfFiles != null) {
+            Arrays.sort(listOfFiles, Comparator.comparing(File::lastModified, reverseOrder()));
+        }
+
+        if (listOfFiles != null) {
+            for (File file : listOfFiles) {
+                log.info(file.getName());
+                if (file.getName().contains(componentName) && file.getName().contains(".log")) {
+                    log.info("Подходящий файл найден: " + file.getName());
+                    return file.getName();
+                }
+            }
+        }
+
+        return null;
     }
 
 
