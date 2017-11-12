@@ -17,10 +17,10 @@ import static java.util.Collections.reverseOrder;
 
 public class ComponentOperator {
     private static final Logger log = LogManager.getLogger(ComponentOperator.class);
-    private FileInformator fileInformator;
+    private FileInformator fileInformator = new FileInformator();
+    private FileOperator fileOperator = new FileOperator();
 
     public ComponentOperator() {
-        fileInformator = new FileInformator();
     }
 
     /**
@@ -36,16 +36,11 @@ public class ComponentOperator {
                 + "serviceName: " + serviceName + " | "
                 + "pathLastVersion " + pathLastVersion + " | "
                 + "pathComponent: " + pathComponent);
-        FileCopyer copyFiles = new FileCopyer();
 
         stopComponent(pathServer, serviceName);
         checkServiceStop(pathServer, serviceName);
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        copyFiles.copyFiles(pathLastVersion, pathComponent);
+        fileOperator.deleteFile(pathComponent + "Starter.log");
+        fileOperator.copyFiles(pathLastVersion, pathComponent);
         startComponent(pathServer, serviceName);
     }
 
@@ -86,16 +81,11 @@ public class ComponentOperator {
                 + "serviceName: " + serviceName + " | "
                 + "pathComponent: " + pathComponent + " | "
                 + "pathPastVersion: " + pathPastVersion);
-        FileCopyer copyFiles = new FileCopyer();
 
         stopComponent(pathServer, serviceName);
         checkServiceStop(pathServer, serviceName);
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        copyFiles.copyFiles(pathPastVersion, pathComponent);
+        fileOperator.deleteFile(pathComponent + "Starter.log");
+        fileOperator.copyFiles(pathPastVersion, pathComponent);
         startComponent(pathServer, serviceName);
     }
 
@@ -206,7 +196,7 @@ public class ComponentOperator {
             Arrays.sort(listOfFiles, Comparator.comparing(File::getName, reverseOrder()));
         }
 
-        Pattern p = Pattern.compile("[0-9]+");
+        Pattern p = Pattern.compile("[0-9_]+");
         log.info("Get rollback dates....");
         log.info(pathLastVersion);
 
@@ -219,7 +209,7 @@ public class ComponentOperator {
                     if (m_.matches()) {
                         log.info(s_);
                         i++;
-                        rollbackDateButtonList.add(s_);
+                        rollbackDateButtonList.add(s_.replaceAll("_", ""));
                     }
                 } else {
                     String s = file.getName();
@@ -227,7 +217,7 @@ public class ComponentOperator {
                     if (m.matches()) {
                         i++;
                         log.info(s);
-                        rollbackDateButtonList.add(s);
+                        rollbackDateButtonList.add(s.replaceAll("_", ""));
                     }
                 }
                 if (i == 3) {
@@ -247,17 +237,14 @@ public class ComponentOperator {
      */
     public String getPathPastVersion(String pathSales, String rollbackDate) {
         File folder = new File(pathSales);
-        File[] listOfFiles = folder.listFiles(File::isDirectory);
+        File[] listOfFiles = folder.listFiles((dir, name) -> name.contains("Full_" + rollbackDate));
         log.info("Get rollback path....");
         log.info(pathSales);
 
         if (listOfFiles != null) {
-            for (File file : listOfFiles) {
-                log.info(file.getName());
-                if (file.getName().contains("Full_" + rollbackDate)) {
-                    log.info("Подходящая папка найдена: " + file.getName());
-                    return file.getName();
-                }
+            if (listOfFiles.length == 1) {
+                log.info("Подходящая папка найдена: " + listOfFiles[0].getName());
+                return listOfFiles[0].getName();
             }
         }
         return null;

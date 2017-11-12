@@ -19,7 +19,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import utils.ComponentOperator;
-import utils.FileOpener;
+import utils.FileOperator;
 import view.OptionListController;
 
 import java.io.IOException;
@@ -28,8 +28,9 @@ import java.util.HashSet;
 
 public class GUIGenerator extends Application {
     private DataGenerator dataGenerator = new DataGenerator("Config.xml");
-    private FileOpener fileOpener = new FileOpener();
+    private FileOperator fileOpener = new FileOperator();
     private ComponentOperator componentOperator = new ComponentOperator();
+
     private Stage primaryStage;
     private BorderPane rootLayout;
     private int maxCountComponents;
@@ -40,6 +41,10 @@ public class GUIGenerator extends Application {
 
     public ComponentOperator getComponentOperator() {
         return componentOperator;
+    }
+
+    public FileOperator getFileOpener() {
+        return fileOpener;
     }
 
     @Override
@@ -199,6 +204,7 @@ public class GUIGenerator extends Application {
             // Загрузить fxml-файл для создания новой сцены для окна
             FXMLLoader loader = new FXMLLoader(this.getClass().getClassLoader().getResource("OptionList.fxml"));
             AnchorPane page = loader.load();
+            OptionListController controller = loader.getController();
 
             Stage dialogStage = new Stage();
             dialogStage.setTitle(project.getProjectName() + " / " + component.getComponentName());
@@ -207,15 +213,16 @@ public class GUIGenerator extends Application {
             dialogStage.initStyle(StageStyle.UTILITY);
             dialogStage.initOwner(null);
             dialogStage.setResizable(false);
-            dialogStage.setOnCloseRequest(e -> openComponentLists.remove(project.getProjectName() + "." + component.getComponentName()));
+            dialogStage.setOnCloseRequest(e -> {
+                openComponentLists.remove(project.getProjectName() + "." + component.getComponentName());
+                controller.threadIsDead(); //Окно закрыто и все порожденные потоки останавливаются
+            });
 
             Scene scene = new Scene(page);
             dialogStage.setScene(scene);
 
             // Передача настройки в контроллер
-            OptionListController controller = loader.getController();
             controller.setGuiGenerator(this, dialogStage);
-            controller.setFileOpener(fileOpener);
             controller.setComponentData(project, component);
 
             dialogStage.show();
