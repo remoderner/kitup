@@ -1,0 +1,13 @@
+#Gradle
+.gradle/
+build/
+
+# IntelliJ IDEA
+/.idea/
+*.iml
+*.iws
+*.ipr
+out/
+src/main/java/META-INF
+Config.xml
+log*
