@@ -1,5 +1,5 @@
 group 'jarjar'
-version '1.4.3'
+version '1.5.9'
 
 apply plugin: 'java'
 
@@ -20,7 +20,6 @@ repositories {
 }
 
 configurations {
-    compile
 }
 
 dependencies {

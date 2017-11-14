@@ -11,7 +11,6 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import utils.FileOpener;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -55,11 +54,16 @@ public class OptionListController {
     private String pathComponent;
     private String componentName;
 
+    private Boolean threadIsAlive;
+
     private Stage dialogStage;
     private GUIGenerator guiGenerator; // Ссылка на главное приложение.
-    private FileOpener fileOpener;
 
     public OptionListController() {
+    }
+
+    public void threadIsDead() {
+        threadIsAlive = false;
     }
 
     /**
@@ -75,10 +79,6 @@ public class OptionListController {
         this.dialogStage = dialogStage;
     }
 
-    public void setFileOpener(FileOpener fileOpener) {
-        this.fileOpener = fileOpener;
-    }
-
     public void setComponentData(Project project, Component component) {
         pathServer = project.getServerName();
         pathSales = project.getSalesDirName();
@@ -86,20 +86,54 @@ public class OptionListController {
         pathLastVersion = component.getLastVersionDirName();
         pathComponent = component.getComponentDirName();
         componentName = component.getComponentName();
-        String currentComponentVersion = guiGenerator.getComponentOperator().getComponentVersion(componentName + ".dll", pathComponent, "FileVersion");
-        String lastComponentVersion = guiGenerator.getComponentOperator().getComponentVersion(componentName + ".dll", pathLastVersion, "FileVersion");
-        componentVersion.setText(currentComponentVersion);
 
-        if (!Objects.equals(currentComponentVersion, lastComponentVersion)) {
-            update.getStylesheets().add("/ButtonWarning.css");
-        } else {
-            update.getStylesheets().add("/ButtonGood.css");
-        }
+        Service backqroundThread = new Service<Void>() {
+            protected Task<Void> createTask() {
+                return new Task<>() {
+                    protected Void call() {
+                        threadIsAlive = true;
+                        monitorComponentVersion();
+                        return null;
+                    }
+                };
+            }
+        };
+        backqroundThread.restart();
     }
 
     private void setRollbackDates(ArrayList<Button> rollbackDateButtonList) {
         dialogStage.setHeight(330 + 37 * rollbackDateButtonList.size());
         rollbackDates.getChildren().addAll(rollbackDateButtonList);
+    }
+
+    /**
+     * MONITORING COMPONENT VERSION
+     */
+    private void monitorComponentVersion() {
+        //noinspection InfiniteLoopStatement
+        while (threadIsAlive) {
+            System.out.println("monitorComponentVersion iteration " + Thread.currentThread().isAlive());
+            System.out.println(Thread.currentThread().getId());
+            System.out.println(Thread.currentThread().getThreadGroup());
+            System.out.println(Thread.currentThread().getContextClassLoader());
+            String currentComponentVersion = guiGenerator.getComponentOperator().getComponentVersion(componentName + ".dll", pathComponent, "FileVersion");
+            String lastComponentVersion = guiGenerator.getComponentOperator().getComponentVersion(componentName + ".dll", pathLastVersion, "FileVersion");
+            componentVersion.setText(currentComponentVersion);
+
+            if (Objects.equals(currentComponentVersion, lastComponentVersion)) {
+                update.getStylesheets().clear();
+                update.getStylesheets().add("/ButtonGood.css");
+            } else {
+                update.getStylesheets().clear();
+                update.getStylesheets().add("/ButtonWarning.css");
+            }
+
+            try {
+                Thread.sleep(60000);
+            } catch (InterruptedException e) {
+                System.err.println("WARNING: " + e.toString());
+            }
+        }
     }
 
     /**
@@ -124,6 +158,7 @@ public class OptionListController {
             String currentComponentVersion = guiGenerator.getComponentOperator().getComponentVersion(componentName + ".dll", pathComponent, "FileVersion");
             String lastComponentVersion = guiGenerator.getComponentOperator().getComponentVersion(componentName + ".dll", pathLastVersion, "FileVersion");
             if (Objects.equals(currentComponentVersion, lastComponentVersion)) {
+                Platform.runLater(() -> update.getStylesheets().clear());
                 Platform.runLater(() -> update.getStylesheets().add("/ButtonGood.css"));
             }
             componentVersion.setText(currentComponentVersion);
@@ -149,10 +184,7 @@ public class OptionListController {
             }
         };
 
-        backqroundThread.setOnSucceeded(event -> {
-            restart.setStyle(null);
-            restart.setDisable(false);
-        });
+        backqroundThread.setOnSucceeded(event -> restart.setDisable(false));
 
         restart.setDisable(true);
         backqroundThread.restart();
@@ -174,10 +206,7 @@ public class OptionListController {
             }
         };
 
-        backqroundThread.setOnSucceeded(event -> {
-            start.setStyle(null);
-            start.setDisable(false);
-        });
+        backqroundThread.setOnSucceeded(event -> start.setDisable(false));
 
         start.setDisable(true);
         backqroundThread.restart();
@@ -199,10 +228,7 @@ public class OptionListController {
             }
         };
 
-        backqroundThread.setOnSucceeded(event -> {
-            stop.setStyle(null);
-            stop.setDisable(false);
-        });
+        backqroundThread.setOnSucceeded(event -> stop.setDisable(false));
 
         stop.setDisable(true);
         backqroundThread.restart();
@@ -218,7 +244,7 @@ public class OptionListController {
                 return new Task<>() {
                     protected Void call() {
                         String link = pathComponent + componentName + ".ini";
-                        fileOpener.openFile(link);
+                        guiGenerator.getFileOpener().openFile(link);
                         return null;
                     }
                 };
@@ -242,7 +268,7 @@ public class OptionListController {
                     protected Void call() {
                         String actualLogName = guiGenerator.getComponentOperator().getComponentLogName(componentName, pathComponent);
                         String link = pathComponent + actualLogName;
-                        fileOpener.openFile(link);
+                        guiGenerator.getFileOpener().openFile(link);
                         return null;
                     }
                 };
@@ -265,7 +291,7 @@ public class OptionListController {
                 return new Task<>() {
                     protected Void call() {
                         String link = pathComponent;
-                        fileOpener.openDir(link);
+                        guiGenerator.getFileOpener().openDir(link);
                         return null;
                     }
                 };
@@ -296,7 +322,7 @@ public class OptionListController {
                             if (pastFolder == null) { //Если папки с откатом не найдено, то не добавляем кнопку
                                 continue;
                             }
-                            String pathPastVersion = pathSales + pastFolder + "\\" + "SrvComp" + "\\" + componentName;
+                            String pathPastVersion = pathSales + pastFolder + "\\" + "SrvComp" + "\\" + componentName + "\\";
                             System.out.println("Путь к откату: " + pathPastVersion);
                             Button button = new Button();
                             button.setText(entry);
@@ -323,10 +349,16 @@ public class OptionListController {
                                             button.setDisable(false);
                                             String currentComponentVersion = guiGenerator.getComponentOperator().getComponentVersion(componentName + ".dll", pathComponent, "FileVersion");
                                             String lastComponentVersion = guiGenerator.getComponentOperator().getComponentVersion(componentName + ".dll", pathLastVersion, "FileVersion");
-                                            if (!Objects.equals(currentComponentVersion, lastComponentVersion)) {
-                                                update.getStylesheets().add("/ButtonWarning.css");
-                                            } else {
+                                            componentVersion.setText(currentComponentVersion);
+
+                                            //noinspection Duplicates
+                                            if (Objects.equals(currentComponentVersion, lastComponentVersion)) {
+                                                update.getStylesheets().clear();
                                                 update.getStylesheets().add("/ButtonGood.css");
+
+                                            } else {
+                                                update.getStylesheets().clear();
+                                                update.getStylesheets().add("/ButtonWarning.css");
                                             }
                                         });
 
