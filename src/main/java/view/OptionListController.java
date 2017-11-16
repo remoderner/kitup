@@ -11,11 +11,17 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Objects;
 
 public class OptionListController {
+    private static final Logger logger = LogManager.getLogger(OptionListController.class);
 
     @FXML
     private Button update;
@@ -87,7 +93,7 @@ public class OptionListController {
         pathComponent = component.getComponentDirName();
         componentName = component.getComponentName();
 
-        Service backqroundThread = new Service<Void>() {
+        Service threadMCV = new Service<Void>() {
             protected Task<Void> createTask() {
                 return new Task<>() {
                     protected Void call() {
@@ -98,7 +104,20 @@ public class OptionListController {
                 };
             }
         };
-        backqroundThread.restart();
+        threadMCV.restart();
+
+        Service threadMCS = new Service<Void>() {
+            protected Task<Void> createTask() {
+                return new Task<>() {
+                    protected Void call() {
+                        threadIsAlive = true;
+                        monitorComponentState();
+                        return null;
+                    }
+                };
+            }
+        };
+        threadMCS.restart();
     }
 
     private void setRollbackDates(ArrayList<Button> rollbackDateButtonList) {
@@ -107,19 +126,50 @@ public class OptionListController {
     }
 
     /**
-     * MONITORING COMPONENT VERSION
+     * MONITORING COMPONENT - START/STOP
+     */
+    private void monitorComponentState() {
+        while (threadIsAlive) {
+            try {
+                ProcessBuilder builder = new ProcessBuilder(
+                        "cmd.exe", "/c", "sc " + pathServer + " query " + serviceName + " | find \"STOPPED\"");
+                Process p = builder.start();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream(), "CP866"));
+                String line = reader.readLine();
+                logger.info(line);
+
+                if (line == null) { //Если служба не остановлена
+                    stop.getStylesheets().clear();
+                    start.getStylesheets().clear();
+                    start.getStylesheets().add("/ButtonStart.css");
+                } else {
+                    start.getStylesheets().clear();
+                    stop.getStylesheets().clear();
+                    stop.getStylesheets().add("/ButtonStop.css");
+                }
+            } catch (IOException e) {
+                logger.warn("WARNING: " + e.toString());
+            }
+
+            try {
+                Thread.sleep(30000);
+            } catch (InterruptedException e) {
+                logger.warn("WARNING: " + e.toString());
+            }
+        }
+    }
+
+    /**
+     * MONITORING COMPONENT - VERSION
      */
     private void monitorComponentVersion() {
         //noinspection InfiniteLoopStatement
         while (threadIsAlive) {
-            System.out.println("monitorComponentVersion iteration " + Thread.currentThread().isAlive());
-            System.out.println(Thread.currentThread().getId());
-            System.out.println(Thread.currentThread().getThreadGroup());
-            System.out.println(Thread.currentThread().getContextClassLoader());
             String currentComponentVersion = guiGenerator.getComponentOperator().getComponentVersion(componentName + ".dll", pathComponent, "FileVersion");
             String lastComponentVersion = guiGenerator.getComponentOperator().getComponentVersion(componentName + ".dll", pathLastVersion, "FileVersion");
             componentVersion.setText(currentComponentVersion);
 
+            //noinspection Duplicates
             if (Objects.equals(currentComponentVersion, lastComponentVersion)) {
                 update.getStylesheets().clear();
                 update.getStylesheets().add("/ButtonGood.css");
@@ -129,9 +179,9 @@ public class OptionListController {
             }
 
             try {
-                Thread.sleep(60000);
+                Thread.sleep(30000);
             } catch (InterruptedException e) {
-                System.err.println("WARNING: " + e.toString());
+                logger.warn("WARNING: " + e.toString());
             }
         }
     }
@@ -177,14 +227,22 @@ public class OptionListController {
             protected Task<Void> createTask() {
                 return new Task<>() {
                     protected Void call() {
+                        start.getStylesheets().clear();
+                        stop.getStylesheets().clear();
+                        stop.getStylesheets().add("/ButtonStop.css");
                         guiGenerator.getComponentOperator().restartComponent(pathServer, serviceName);
                         return null;
                     }
                 };
             }
         };
-
-        backqroundThread.setOnSucceeded(event -> restart.setDisable(false));
+        //noinspection Duplicates
+        backqroundThread.setOnSucceeded(event -> {
+            restart.setDisable(false);
+            stop.getStylesheets().clear();
+            start.getStylesheets().clear();
+            start.getStylesheets().add("/ButtonStart.css");
+        });
 
         restart.setDisable(true);
         backqroundThread.restart();
@@ -206,7 +264,12 @@ public class OptionListController {
             }
         };
 
-        backqroundThread.setOnSucceeded(event -> start.setDisable(false));
+        backqroundThread.setOnSucceeded(event -> {
+            start.setDisable(false);
+            stop.getStylesheets().clear();
+            start.getStylesheets().clear();
+            start.getStylesheets().add("/ButtonStart.css");
+        });
 
         start.setDisable(true);
         backqroundThread.restart();
@@ -228,7 +291,12 @@ public class OptionListController {
             }
         };
 
-        backqroundThread.setOnSucceeded(event -> stop.setDisable(false));
+        backqroundThread.setOnSucceeded(event -> {
+            stop.setDisable(false);
+            start.getStylesheets().clear();
+            stop.getStylesheets().clear();
+            stop.getStylesheets().add("/ButtonStop.css");
+        });
 
         stop.setDisable(true);
         backqroundThread.restart();
