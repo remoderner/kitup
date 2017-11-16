@@ -93,7 +93,7 @@ public class OptionListController {
         pathComponent = component.getComponentDirName();
         componentName = component.getComponentName();
 
-        Service backqroundThread1 = new Service<Void>() {
+        Service threadMCV = new Service<Void>() {
             protected Task<Void> createTask() {
                 return new Task<>() {
                     protected Void call() {
@@ -104,9 +104,9 @@ public class OptionListController {
                 };
             }
         };
-        backqroundThread1.restart();
+        threadMCV.restart();
 
-        Service backqroundThread2 = new Service<Void>() {
+        Service threadMCS = new Service<Void>() {
             protected Task<Void> createTask() {
                 return new Task<>() {
                     protected Void call() {
@@ -117,7 +117,7 @@ public class OptionListController {
                 };
             }
         };
-        backqroundThread2.restart();
+        threadMCS.restart();
     }
 
     private void setRollbackDates(ArrayList<Button> rollbackDateButtonList) {
@@ -227,14 +227,22 @@ public class OptionListController {
             protected Task<Void> createTask() {
                 return new Task<>() {
                     protected Void call() {
+                        start.getStylesheets().clear();
+                        stop.getStylesheets().clear();
+                        stop.getStylesheets().add("/ButtonStop.css");
                         guiGenerator.getComponentOperator().restartComponent(pathServer, serviceName);
                         return null;
                     }
                 };
             }
         };
-
-        backqroundThread.setOnSucceeded(event -> restart.setDisable(false));
+        //noinspection Duplicates
+        backqroundThread.setOnSucceeded(event -> {
+            restart.setDisable(false);
+            stop.getStylesheets().clear();
+            start.getStylesheets().clear();
+            start.getStylesheets().add("/ButtonStart.css");
+        });
 
         restart.setDisable(true);
         backqroundThread.restart();
@@ -256,7 +264,12 @@ public class OptionListController {
             }
         };
 
-        backqroundThread.setOnSucceeded(event -> start.setDisable(false));
+        backqroundThread.setOnSucceeded(event -> {
+            start.setDisable(false);
+            stop.getStylesheets().clear();
+            start.getStylesheets().clear();
+            start.getStylesheets().add("/ButtonStart.css");
+        });
 
         start.setDisable(true);
         backqroundThread.restart();
@@ -278,7 +291,12 @@ public class OptionListController {
             }
         };
 
-        backqroundThread.setOnSucceeded(event -> stop.setDisable(false));
+        backqroundThread.setOnSucceeded(event -> {
+            stop.setDisable(false);
+            start.getStylesheets().clear();
+            stop.getStylesheets().clear();
+            stop.getStylesheets().add("/ButtonStop.css");
+        });
 
         stop.setDisable(true);
         backqroundThread.restart();
