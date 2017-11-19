@@ -204,7 +204,7 @@ public class GUIGenerator extends Application {
             // Загрузить fxml-файл для создания новой сцены для окна
             FXMLLoader loader = new FXMLLoader(this.getClass().getClassLoader().getResource("OptionList.fxml"));
             AnchorPane page = loader.load();
-            OptionListController controller = loader.getController();
+            OptionListController optionListController = loader.getController();
 
             Stage dialogStage = new Stage();
             dialogStage.setTitle(project.getProjectName() + " / " + component.getComponentName());
@@ -215,15 +215,15 @@ public class GUIGenerator extends Application {
             dialogStage.setResizable(false);
             dialogStage.setOnCloseRequest(e -> {
                 openComponentLists.remove(project.getProjectName() + "." + component.getComponentName());
-                controller.threadIsDead(); //Окно закрыто и все порожденные потоки останавливаются
+                optionListController.threadIsDead(); //Окно закрыто и все порожденные потоки останавливаются
             });
 
             Scene scene = new Scene(page);
             dialogStage.setScene(scene);
 
             // Передача настройки в контроллер
-            controller.setGuiGenerator(this, dialogStage);
-            controller.setComponentData(project, component);
+            optionListController.setGuiGenerator(this, dialogStage);
+            optionListController.setComponentData(project, component);
 
             dialogStage.show();
         } catch (IOException e) {

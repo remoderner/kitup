@@ -2,6 +2,7 @@ package utils;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import view.OptionListController;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -19,8 +20,13 @@ public class ComponentOperator {
     private static final Logger log = LogManager.getLogger(ComponentOperator.class);
     private FileInformator fileInformator = new FileInformator();
     private FileOperator fileOperator = new FileOperator();
+    private OptionListController optionListController;
 
     public ComponentOperator() {
+    }
+
+    public void setOptionListController(OptionListController optionListController) {
+        this.optionListController = optionListController;
     }
 
     /**
@@ -38,7 +44,6 @@ public class ComponentOperator {
                 + "pathComponent: " + pathComponent);
 
         stopComponent(pathServer, serviceName);
-        checkServiceStop(pathServer, serviceName);
         fileOperator.deleteFile(pathComponent + "Starter.log");
         fileOperator.copyFiles(pathLastVersion, pathComponent);
         startComponent(pathServer, serviceName);
@@ -51,7 +56,6 @@ public class ComponentOperator {
         log.info("pathServer: " + pathServer + " | "
                 + "serviceName: " + serviceName);
         stopComponent(pathServer, serviceName);
-        checkServiceStop(pathServer, serviceName);
         startComponent(pathServer, serviceName);
     }
 
@@ -62,6 +66,7 @@ public class ComponentOperator {
         log.info("pathServer: " + pathServer + " | "
                 + "serviceName: " + serviceName);
         cmdRun(pathServer, serviceName, " start ");
+        waitServiceStart(pathServer, serviceName);
     }
 
     /**
@@ -71,6 +76,7 @@ public class ComponentOperator {
         log.info("pathServer: " + pathServer + " | "
                 + "serviceName " + serviceName);
         cmdRun(pathServer, serviceName, " stop ");
+        waitServiceStop(pathServer, serviceName);
     }
 
     /**
@@ -83,7 +89,6 @@ public class ComponentOperator {
                 + "pathPastVersion: " + pathPastVersion);
 
         stopComponent(pathServer, serviceName);
-        checkServiceStop(pathServer, serviceName);
         fileOperator.deleteFile(pathComponent + "Starter.log");
         fileOperator.copyFiles(pathPastVersion, pathComponent);
         startComponent(pathServer, serviceName);
@@ -107,40 +112,104 @@ public class ComponentOperator {
                 log.info(line);
             }
         } catch (IOException e) {
-            log.warn("Error: " + e.toString());
+            log.warn("WARNING: " + e.toString());
         }
     }
 
     /**
-     * CHECK SERVICE - STOP
+     * WAIT SERVICE STOP
      * Запрос состояния службы (ожидание остановки)
      */
-    private void checkServiceStop(String pathServer, String serviceName) {
+    private void waitServiceStop(String pathServer, String serviceName) {
         log.info("cmd.exe: " + "/c " + "sc " + pathServer + " query " + serviceName + " | find \"STOPPED\"");
+        int stopTryAmount = 1;
         try {
             for (int i = 0; ; i++) { // Запрашиваем состояние службы
-                ProcessBuilder builder = new ProcessBuilder(
-                        "cmd.exe", "/c", "sc " + pathServer + " query " + serviceName + " | find \"STOPPED\"");
-                Process p = builder.start();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream(), "CP866"));
-                String line = reader.readLine();
-                if (line == null) { //Если служба не остановлена
+                Boolean serviceStopped = checkServiceState(pathServer, serviceName, "STOPPED");
+                if (!serviceStopped) { //Если служба не остановлена
                     log.info("Wait stoping service " + serviceName + "....");
                     Thread.sleep(2000);
                 } else { //Если служба остановлена
-                    log.info(line);
                     log.info("....Service " + serviceName + " is stoped");
+                    optionListController.componentStateNotificator("stop");
                     break;
                 }
 
                 if (i == 5) { // Если компонента не остановлена в течении 10 секунд, повторяем попытку
                     stopComponent(pathServer, serviceName);
                     i = 0;
+                    stopTryAmount++;
+                }
+
+                //Если комопнента не остановлена после 5 попыток
+                if (stopTryAmount == 5) {
+                    break;
                 }
             }
-        } catch (IOException | InterruptedException e) {
-            log.warn("Error: " + e.toString());
+        } catch (InterruptedException e) {
+            log.warn("WARNING: " + e.toString());
         }
+    }
+
+    /**
+     * WAIT SERVICE START
+     * Запрос состояния службы (ожидание запуска)
+     */
+    private void waitServiceStart(String pathServer, String serviceName) {
+        log.info("cmd.exe: " + "/c " + "sc " + pathServer + " query " + serviceName + " | find \"RUNNING\"");
+        int startTryAmount = 1;
+        try {
+            for (int i = 0; ; i++) { // Запрашиваем состояние службы
+                Boolean serviceStarted = checkServiceState(pathServer, serviceName, "RUNNING");
+                if (!serviceStarted) { //Если служба не запущена
+                    log.info("Wait running service " + serviceName + "....");
+                    Thread.sleep(2000);
+                } else { //Если служба запущена
+                    log.info("....Service " + serviceName + " is running");
+                    optionListController.componentStateNotificator("start");
+                    break;
+                }
+
+                if (i == 5) { // Если компонента не запущена в течении 10 секунд, повторяем попытку
+                    startComponent(pathServer, serviceName);
+                    i = 0;
+                    startTryAmount++;
+                }
+
+                //Если комопнента не запущена после 5 попыток
+                if (startTryAmount == 5) {
+                    break;
+                }
+            }
+        } catch (InterruptedException e) {
+            log.warn("WARNING: " + e.toString());
+        }
+    }
+
+    /**
+     * CHECK COMPONENT STATE
+     */
+    public Boolean checkServiceState(String pathServer, String serviceName, String checkState) {
+        String line = null;
+        Boolean checkResult = false;
+        log.info(pathServer + " | " + serviceName + " | " + checkState);
+
+        try {
+            ProcessBuilder builder = new ProcessBuilder(
+                    "cmd.exe", "/c", "sc " + pathServer + " query " + serviceName + " | find \"" + checkState + "\"");
+            Process p = builder.start();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream(), "CP866"));
+            line = reader.readLine();
+        } catch (IOException e) {
+            log.warn("WARNING: " + e.toString());
+        }
+
+        if (line != null) {
+            checkResult = true;
+        }
+
+        log.info(checkResult);
+        return checkResult;
     }
 
     /**
@@ -180,7 +249,6 @@ public class ComponentOperator {
         return null;
     }
 
-
     /**
      * Вернуть даты для откатов (последние 3)
      *
@@ -196,35 +264,30 @@ public class ComponentOperator {
             Arrays.sort(listOfFiles, Comparator.comparing(File::getName, reverseOrder()));
         }
 
-        Pattern p = Pattern.compile("[0-9_]+");
+        Pattern p = Pattern.compile("-?\\d+");
         log.info("Get rollback dates....");
         log.info(pathLastVersion);
 
         if (listOfFiles != null) {
             int i = 0;
             for (File file : listOfFiles) {
-                if (0 < file.getName().lastIndexOf("_")) {
-                    String s_ = file.getName().substring(0, (file.getName().lastIndexOf("_")));
-                    Matcher m_ = p.matcher(s_);
-                    if (m_.matches()) {
-                        log.info(s_);
-                        i++;
-                        rollbackDateButtonList.add(s_.replaceAll("_", ""));
-                    }
-                } else {
-                    String s = file.getName();
-                    Matcher m = p.matcher(s);
-                    if (m.matches()) {
+                String s = "";
+                Matcher m = p.matcher(file.getName());
+                while (m.find()) {
+                    s = s + m.group();
+                    if (s.length() == 8) {
                         i++;
                         log.info(s);
-                        rollbackDateButtonList.add(s.replaceAll("_", ""));
+                        rollbackDateButtonList.add(s);
                     }
                 }
+
                 if (i == 3) {
                     break;
                 }
             }
         }
+
         return rollbackDateButtonList;
     }
 
