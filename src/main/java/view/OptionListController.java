@@ -13,10 +13,8 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import utils.ComponentOperator;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -60,10 +58,11 @@ public class OptionListController {
     private String pathComponent;
     private String componentName;
 
-    private Boolean threadIsAlive;
+    private Boolean threadIsAlive = true;
 
     private Stage dialogStage;
-    private GUIGenerator guiGenerator; // Ссылка на главное приложение.
+    private GUIGenerator guiGenerator;
+    private ComponentOperator componentOperator;
 
     public OptionListController() {
     }
@@ -83,6 +82,8 @@ public class OptionListController {
     public void setGuiGenerator(GUIGenerator guiGenerator, Stage dialogStage) {
         this.guiGenerator = guiGenerator;
         this.dialogStage = dialogStage;
+        componentOperator = guiGenerator.getComponentOperator();
+        componentOperator.setOptionListController(this);
     }
 
     public void setComponentData(Project project, Component component) {
@@ -94,30 +95,32 @@ public class OptionListController {
         componentName = component.getComponentName();
 
         Service threadMCV = new Service<Void>() {
+            @Override
             protected Task<Void> createTask() {
                 return new Task<>() {
+                    @Override
                     protected Void call() {
-                        threadIsAlive = true;
                         monitorComponentVersion();
                         return null;
                     }
                 };
             }
         };
-        threadMCV.restart();
+        threadMCV.start();
 
         Service threadMCS = new Service<Void>() {
+            @Override
             protected Task<Void> createTask() {
                 return new Task<>() {
+                    @Override
                     protected Void call() {
-                        threadIsAlive = true;
                         monitorComponentState();
                         return null;
                     }
                 };
             }
         };
-        threadMCS.restart();
+        threadMCS.start();
     }
 
     private void setRollbackDates(ArrayList<Button> rollbackDateButtonList) {
@@ -130,26 +133,7 @@ public class OptionListController {
      */
     private void monitorComponentState() {
         while (threadIsAlive) {
-            try {
-                ProcessBuilder builder = new ProcessBuilder(
-                        "cmd.exe", "/c", "sc " + pathServer + " query " + serviceName + " | find \"STOPPED\"");
-                Process p = builder.start();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream(), "CP866"));
-                String line = reader.readLine();
-                logger.info(line);
-
-                if (line == null) { //Если служба не остановлена
-                    stop.getStylesheets().clear();
-                    start.getStylesheets().clear();
-                    start.getStylesheets().add("/ButtonStart.css");
-                } else {
-                    start.getStylesheets().clear();
-                    stop.getStylesheets().clear();
-                    stop.getStylesheets().add("/ButtonStop.css");
-                }
-            } catch (IOException e) {
-                logger.warn("WARNING: " + e.toString());
-            }
+            componentStateNotificator("auto");
 
             try {
                 Thread.sleep(30000);
@@ -163,12 +147,11 @@ public class OptionListController {
      * MONITORING COMPONENT - VERSION
      */
     private void monitorComponentVersion() {
-        //noinspection InfiniteLoopStatement
-        while (threadIsAlive) {
-            String currentComponentVersion = guiGenerator.getComponentOperator().getComponentVersion(componentName + ".dll", pathComponent, "FileVersion");
-            String lastComponentVersion = guiGenerator.getComponentOperator().getComponentVersion(componentName + ".dll", pathLastVersion, "FileVersion");
-            componentVersion.setText(currentComponentVersion);
 
+        while (threadIsAlive) {
+            String currentComponentVersion = componentOperator.getComponentVersion(componentName + ".dll", pathComponent, "FileVersion");
+            String lastComponentVersion = componentOperator.getComponentVersion(componentName + ".dll", pathLastVersion, "FileVersion");
+            componentVersion.setText(currentComponentVersion);
             //noinspection Duplicates
             if (Objects.equals(currentComponentVersion, lastComponentVersion)) {
                 update.getStylesheets().clear();
@@ -187,6 +170,27 @@ public class OptionListController {
     }
 
     /**
+     * COMPONENT STATE NOTIFICATOR
+     */
+    public void componentStateNotificator(String state) {
+        Boolean serviceRunning = false;
+
+        if (state.equals("auto")) {
+            serviceRunning = componentOperator.checkServiceState(pathServer, serviceName, "RUNNING");
+        }
+
+        if ((serviceRunning && state.equals("auto")) || state.equals("start")) { //Если служба запущена
+            stop.getStylesheets().clear();
+            start.getStylesheets().clear();
+            start.getStylesheets().add("/ButtonStart.css");
+        } else {
+            start.getStylesheets().clear();
+            stop.getStylesheets().clear();
+            stop.getStylesheets().add("/ButtonStop.css");
+        }
+    }
+
+    /**
      * UPDATE
      */
     @FXML
@@ -195,7 +199,7 @@ public class OptionListController {
             protected Task<Void> createTask() {
                 return new Task<>() {
                     protected Void call() {
-                        guiGenerator.getComponentOperator().updateComponent(pathServer, serviceName, pathLastVersion, pathComponent);
+                        componentOperator.updateComponent(pathServer, serviceName, pathLastVersion, pathComponent);
                         return null;
                     }
                 };
@@ -203,13 +207,12 @@ public class OptionListController {
         };
 
         backqroundThread.setOnSucceeded(event -> {
-            update.setStyle(null);
             update.setDisable(false);
-            String currentComponentVersion = guiGenerator.getComponentOperator().getComponentVersion(componentName + ".dll", pathComponent, "FileVersion");
-            String lastComponentVersion = guiGenerator.getComponentOperator().getComponentVersion(componentName + ".dll", pathLastVersion, "FileVersion");
+            String currentComponentVersion = componentOperator.getComponentVersion(componentName + ".dll", pathComponent, "FileVersion");
+            String lastComponentVersion = componentOperator.getComponentVersion(componentName + ".dll", pathLastVersion, "FileVersion");
             if (Objects.equals(currentComponentVersion, lastComponentVersion)) {
-                Platform.runLater(() -> update.getStylesheets().clear());
-                Platform.runLater(() -> update.getStylesheets().add("/ButtonGood.css"));
+                update.getStylesheets().clear();
+                update.getStylesheets().add("/ButtonGood.css");
             }
             componentVersion.setText(currentComponentVersion);
         });
@@ -227,22 +230,13 @@ public class OptionListController {
             protected Task<Void> createTask() {
                 return new Task<>() {
                     protected Void call() {
-                        start.getStylesheets().clear();
-                        stop.getStylesheets().clear();
-                        stop.getStylesheets().add("/ButtonStop.css");
-                        guiGenerator.getComponentOperator().restartComponent(pathServer, serviceName);
+                        componentOperator.restartComponent(pathServer, serviceName);
                         return null;
                     }
                 };
             }
         };
-        //noinspection Duplicates
-        backqroundThread.setOnSucceeded(event -> {
-            restart.setDisable(false);
-            stop.getStylesheets().clear();
-            start.getStylesheets().clear();
-            start.getStylesheets().add("/ButtonStart.css");
-        });
+        backqroundThread.setOnSucceeded(event -> restart.setDisable(false));
 
         restart.setDisable(true);
         backqroundThread.restart();
@@ -253,26 +247,21 @@ public class OptionListController {
      */
     @FXML
     private void startComponent() {
-        Service backqroundThread = new Service<Void>() {
+        Service threadStartCom = new Service<Void>() {
             protected Task<Void> createTask() {
                 return new Task<>() {
                     protected Void call() {
-                        guiGenerator.getComponentOperator().startComponent(pathServer, serviceName);
+                        componentOperator.startComponent(pathServer, serviceName);
                         return null;
                     }
                 };
             }
         };
 
-        backqroundThread.setOnSucceeded(event -> {
-            start.setDisable(false);
-            stop.getStylesheets().clear();
-            start.getStylesheets().clear();
-            start.getStylesheets().add("/ButtonStart.css");
-        });
+        threadStartCom.setOnSucceeded(event -> start.setDisable(false));
 
         start.setDisable(true);
-        backqroundThread.restart();
+        threadStartCom.restart();
     }
 
     /**
@@ -284,19 +273,14 @@ public class OptionListController {
             protected Task<Void> createTask() {
                 return new Task<>() {
                     protected Void call() {
-                        guiGenerator.getComponentOperator().stopComponent(pathServer, serviceName);
+                        componentOperator.stopComponent(pathServer, serviceName);
                         return null;
                     }
                 };
             }
         };
 
-        backqroundThread.setOnSucceeded(event -> {
-            stop.setDisable(false);
-            start.getStylesheets().clear();
-            stop.getStylesheets().clear();
-            stop.getStylesheets().add("/ButtonStop.css");
-        });
+        backqroundThread.setOnSucceeded(event -> stop.setDisable(false));
 
         stop.setDisable(true);
         backqroundThread.restart();
@@ -334,7 +318,7 @@ public class OptionListController {
             protected Task<Void> createTask() {
                 return new Task<>() {
                     protected Void call() {
-                        String actualLogName = guiGenerator.getComponentOperator().getComponentLogName(componentName, pathComponent);
+                        String actualLogName = componentOperator.getComponentLogName(componentName, pathComponent);
                         String link = pathComponent + actualLogName;
                         guiGenerator.getFileOpener().openFile(link);
                         return null;
@@ -385,8 +369,8 @@ public class OptionListController {
                 return new Task<>() {
                     protected Void call() {
                         ArrayList<Button> rollbackDateButtonList = new ArrayList<>();
-                        for (String entry : guiGenerator.getComponentOperator().getRollbackDates(pathLastVersion)) {
-                            String pastFolder = guiGenerator.getComponentOperator().getPathPastVersion(pathSales, entry);
+                        for (String entry : componentOperator.getRollbackDates(pathLastVersion)) {
+                            String pastFolder = componentOperator.getPathPastVersion(pathSales, entry);
                             if (pastFolder == null) { //Если папки с откатом не найдено, то не добавляем кнопку
                                 continue;
                             }
@@ -406,7 +390,7 @@ public class OptionListController {
                                             protected Task<Void> createTask() {
                                                 return new Task<>() {
                                                     protected Void call() {
-                                                        guiGenerator.getComponentOperator().rollbackComponent(pathServer, serviceName, pathComponent, pathPastVersion);
+                                                        componentOperator.rollbackComponent(pathServer, serviceName, pathComponent, pathPastVersion);
                                                         return null;
                                                     }
                                                 };
@@ -415,8 +399,8 @@ public class OptionListController {
 
                                         backqroundThread.setOnSucceeded(event -> {
                                             button.setDisable(false);
-                                            String currentComponentVersion = guiGenerator.getComponentOperator().getComponentVersion(componentName + ".dll", pathComponent, "FileVersion");
-                                            String lastComponentVersion = guiGenerator.getComponentOperator().getComponentVersion(componentName + ".dll", pathLastVersion, "FileVersion");
+                                            String currentComponentVersion = componentOperator.getComponentVersion(componentName + ".dll", pathComponent, "FileVersion");
+                                            String lastComponentVersion = componentOperator.getComponentVersion(componentName + ".dll", pathLastVersion, "FileVersion");
                                             componentVersion.setText(currentComponentVersion);
 
                                             //noinspection Duplicates

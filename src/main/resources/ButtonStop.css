@@ -3,14 +3,14 @@
 
 .button {
     -fx-background-size: 100% 100%;
-    -fx-background-color: #FA8072, #d2584a, #FA8072;
+    -fx-background-color: #ff9696, #ff5a5a, #ff9696;
     -fx-background-insets: 1;
     -fx-background-radius: 2;
-    -fx-border-color: #d2584a;
+    -fx-border-color: #ff5a5a;
     -fx-border-radius: 2;
     -fx-focus-traversable: false;
 }
 
 .button:hover {
-    -fx-background-color: #e66c5e, #d2584a, #e66c5e;
+    -fx-background-color: #ff7878, #ff5a5a, #ff7878;
 }
