@@ -203,17 +203,19 @@ public class GUIGenerator extends Application {
         try {
             // Загрузить fxml-файл для создания новой сцены для окна
             FXMLLoader loader = new FXMLLoader(this.getClass().getClassLoader().getResource("OptionList.fxml"));
-            AnchorPane page = loader.load();
+            VBox page = loader.load();
             OptionListController optionListController = loader.getController();
 
             Stage dialogStage = new Stage();
-            dialogStage.setTitle(project.getProjectName() + " / " + component.getComponentName());
             dialogStage.setAlwaysOnTop(true);
             dialogStage.initModality(Modality.NONE);
-            dialogStage.initStyle(StageStyle.UTILITY);
+            dialogStage.initStyle(StageStyle.TRANSPARENT);
             dialogStage.initOwner(null);
             dialogStage.setResizable(false);
-            dialogStage.setOnCloseRequest(e -> {
+
+            dialogStage.focusedProperty().addListener((ov, t, t1) -> optionListController.windowFocused(t1));
+
+            dialogStage.setOnHiding(e -> {
                 openComponentLists.remove(project.getProjectName() + "." + component.getComponentName());
                 optionListController.threadIsDead(); //Окно закрыто и все порожденные потоки останавливаются
             });
