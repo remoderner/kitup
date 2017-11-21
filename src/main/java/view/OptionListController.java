@@ -8,6 +8,9 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -20,6 +23,16 @@ import java.util.Objects;
 
 public class OptionListController {
     private static final Logger logger = LogManager.getLogger(OptionListController.class);
+    @FXML
+    VBox rootVBox;
+
+    @FXML
+    HBox titleHBox;
+    private double xOffset = 0;
+    private double yOffset = 0;
+
+    @FXML
+    private Label titleLabel;
 
     @FXML
     private Button update;
@@ -68,7 +81,18 @@ public class OptionListController {
     }
 
     public void threadIsDead() {
+        logger.info("Thread is Dead");
         threadIsAlive = false;
+    }
+
+    public void windowFocused(Boolean isWindowFocused) {
+        if (isWindowFocused) {
+            rootVBox.setStyle("-fx-border-color: #5accff");
+            titleLabel.setStyle("-fx-text-fill: black");
+        } else {
+            rootVBox.setStyle("-fx-border-color: #c0c0c0");
+            titleLabel.setStyle("-fx-text-fill: gray");
+        }
     }
 
     /**
@@ -77,6 +101,21 @@ public class OptionListController {
      */
     @FXML
     private void initialize() {
+    }
+
+    @FXML
+    public void closeWindow(MouseEvent mouseEvent) {
+        dialogStage.hide();
+    }
+
+    public void setOnPressed(MouseEvent event) {
+        xOffset = event.getSceneX();
+        yOffset = event.getSceneY();
+    }
+
+    public void setOnDragged(MouseEvent event) {
+        dialogStage.setX(event.getScreenX() - xOffset);
+        dialogStage.setY(event.getScreenY() - yOffset);
     }
 
     public void setGuiGenerator(GUIGenerator guiGenerator, Stage dialogStage) {
@@ -93,6 +132,7 @@ public class OptionListController {
         pathLastVersion = component.getLastVersionDirName();
         pathComponent = component.getComponentDirName();
         componentName = component.getComponentName();
+        titleLabel.setText(project.getProjectName() + " / " + componentName);
 
         Service threadMCV = new Service<Void>() {
             @Override
@@ -438,4 +478,6 @@ public class OptionListController {
         getRollbackDates.setDisable(true);
         backqroundThread.restart();
     }
+
+
 }

@@ -1,3 +1,8 @@
+.rootVBox {
+    -fx-border-width: 1;
+    -fx-border-color: #c0c0c0;
+}
+
 .button:disabled {
 }
 
@@ -18,4 +23,26 @@
 .tab:selected .focus-indicator {
     -fx-focus-color: transparent;
     -fx-border-color: transparent;
+}
+
+.title-bar {
+    -fx-background-color: white;
+    -fx-font-size: 14px;
+}
+
+.close-button {
+    -fx-font-family: Arial;
+    -fx-font-size: 14px;
+    -fx-padding: 3px;
+    -fx-border-size: 1px;
+    -fx-border-color: white;
+}
+
+.close-button:hover {
+    -fx-background-color: #ff9696, #ff5a5a, #ff9696;
+    -fx-background-insets: 1;
+    -fx-background-radius: 2;
+    -fx-border-color: #ff5a5a;
+    -fx-border-radius: 2;
+    -fx-focus-traversable: false;
 }
