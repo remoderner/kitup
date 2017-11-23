@@ -19,6 +19,7 @@ import org.apache.logging.log4j.Logger;
 import utils.ComponentOperator;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Objects;
 
 public class OptionListController {
@@ -164,7 +165,7 @@ public class OptionListController {
     }
 
     private void setRollbackDates(ArrayList<Button> rollbackDateButtonList) {
-        dialogStage.setHeight(330 + 37 * rollbackDateButtonList.size());
+        dialogStage.setHeight(328 + 39 * rollbackDateButtonList.size());
         rollbackDates.getChildren().addAll(rollbackDateButtonList);
     }
 
@@ -176,7 +177,7 @@ public class OptionListController {
             componentStateNotificator("auto");
 
             try {
-                Thread.sleep(30000);
+                Thread.sleep(15000);
             } catch (InterruptedException e) {
                 logger.warn("WARNING: " + e.toString());
             }
@@ -409,15 +410,29 @@ public class OptionListController {
                 return new Task<>() {
                     protected Void call() {
                         ArrayList<Button> rollbackDateButtonList = new ArrayList<>();
-                        for (String entry : componentOperator.getRollbackDates(pathLastVersion)) {
-                            String pastFolder = componentOperator.getPathPastVersion(pathSales, entry);
+                        final Boolean[] isNeedFixVersion = {false};
+                        final String[] pathFixVersion = new String[1];
+
+                        for (Map.Entry<String, String> entry : componentOperator.returnRollbackDates(pathLastVersion).entrySet()) {
+                            String pastFolder = componentOperator.getPathPastVersion(pathSales, entry.getKey());
                             if (pastFolder == null) { //Если папки с откатом не найдено, то не добавляем кнопку
                                 continue;
                             }
                             String pathPastVersion = pathSales + pastFolder + "\\" + "SrvComp" + "\\" + componentName + "\\";
                             System.out.println("Путь к откату: " + pathPastVersion);
                             Button button = new Button();
-                            button.setText(entry);
+                            Button fixButton = new Button();
+
+                            fixButton.setStyle("-fx-padding: 0 7 0 7");
+                            fixButton.setText("fix");
+                            fixButton.setOnAction(e -> {
+                                button.setDisable(true);
+                                isNeedFixVersion[0] = true;
+                                pathFixVersion[0] = pathLastVersion + "\\" + entry.getValue();
+                            });
+
+                            button.setGraphic(fixButton);
+                            button.setText(entry.getKey());
                             button.setPrefWidth(108);
                             button.setOnAction(
                                     (e) -> {
@@ -426,23 +441,27 @@ public class OptionListController {
                                         /*
                                          * Запуск отката компоненты в отдельном потоке
                                          */
-                                        Service backqroundThread = new Service<Void>() {
+                                        Service rollbackThread = new Service<Void>() {
                                             protected Task<Void> createTask() {
                                                 return new Task<>() {
                                                     protected Void call() {
-                                                        componentOperator.rollbackComponent(pathServer, serviceName, pathComponent, pathPastVersion);
+                                                        if (isNeedFixVersion[0]) {
+                                                            componentOperator.rollbackComponent(pathServer, serviceName, pathComponent, pathPastVersion, pathFixVersion[0]);
+                                                        } else {
+                                                            componentOperator.rollbackComponent(pathServer, serviceName, pathComponent, pathPastVersion, null);
+                                                        }
                                                         return null;
                                                     }
                                                 };
                                             }
                                         };
 
-                                        backqroundThread.setOnSucceeded(event -> {
+                                        rollbackThread.setOnSucceeded(event -> {
                                             button.setDisable(false);
+                                            isNeedFixVersion[0] = false;
                                             String currentComponentVersion = componentOperator.getComponentVersion(componentName + ".dll", pathComponent, "FileVersion");
                                             String lastComponentVersion = componentOperator.getComponentVersion(componentName + ".dll", pathLastVersion, "FileVersion");
                                             componentVersion.setText(currentComponentVersion);
-
                                             //noinspection Duplicates
                                             if (Objects.equals(currentComponentVersion, lastComponentVersion)) {
                                                 update.getStylesheets().clear();
@@ -454,7 +473,7 @@ public class OptionListController {
                                             }
                                         });
 
-                                        backqroundThread.restart();
+                                        rollbackThread.restart();
                                     }
                             );
 
