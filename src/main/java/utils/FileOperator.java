@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 
 public class FileOperator {
     private static final Logger log = LogManager.getLogger(ComponentOperator.class);
@@ -60,7 +61,25 @@ public class FileOperator {
         }
     }
 
-    void copyFiles(String sourceDirName, String componentDirName) { //Копирование файлов из одной дериктории в другую
+    ArrayList<String> findFiles(String sourceDirName) {
+        File folder = new File(sourceDirName);
+        File[] listOfFiles = folder.listFiles(File::isFile);
+        ArrayList<String> alreadyCopiedFiles = new ArrayList<>();
+        log.info("Finding files...");
+        log.info("FROM: " + sourceDirName);
+
+        if (listOfFiles != null) {
+            for (File file : listOfFiles) {
+                if (!file.getName().endsWith(".ini")) { //Только файлы, т.е. не копируем папки
+                    alreadyCopiedFiles.add(file.getName());
+                }
+            }
+        }
+
+        return alreadyCopiedFiles;
+    }
+
+    void copyFiles(String sourceDirName, String componentDirName, ArrayList<String> alreadyCopiedFiles) { //Копирование файлов из одной дериктории в другую
         File folder = new File(sourceDirName);
         File[] listOfFiles = folder.listFiles(File::isFile);
         Path destDir = Paths.get(componentDirName);
@@ -71,6 +90,10 @@ public class FileOperator {
         if (listOfFiles != null) {
             for (File file : listOfFiles) {
                 if (!file.getName().endsWith(".ini")) { //Только файлы, т.е. не копируем папки
+                    if (alreadyCopiedFiles != null && alreadyCopiedFiles.contains(file.getName())) {
+                        continue;
+                    }
+
                     log.info(file.getName());
                     try {
                         Files.copy(file.toPath(), destDir.resolve(file.getName()), StandardCopyOption.REPLACE_EXISTING);

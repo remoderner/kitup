@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,7 +46,7 @@ public class ComponentOperator {
 
         stopComponent(pathServer, serviceName);
         fileOperator.deleteFile(pathComponent + "Starter.log");
-        fileOperator.copyFiles(pathLastVersion, pathComponent);
+        fileOperator.copyFiles(pathLastVersion, pathComponent, null);
         startComponent(pathServer, serviceName);
     }
 
@@ -82,15 +83,20 @@ public class ComponentOperator {
     /**
      * ROLLBACK Component
      */
-    public void rollbackComponent(String pathServer, String serviceName, String pathComponent, String pathPastVersion) {
+    public void rollbackComponent(String pathServer, String serviceName, String pathComponent, String pathSource, String pathFixVersion) {
+        ArrayList<String> alreadyCopiedFiles = new ArrayList<>();
         log.info("pathServer: " + pathServer + " | "
                 + "serviceName: " + serviceName + " | "
                 + "pathComponent: " + pathComponent + " | "
-                + "pathPastVersion: " + pathPastVersion);
+                + "pathSource: " + pathSource);
 
         stopComponent(pathServer, serviceName);
         fileOperator.deleteFile(pathComponent + "Starter.log");
-        fileOperator.copyFiles(pathPastVersion, pathComponent);
+        if (pathFixVersion != null) {
+            fileOperator.copyFiles(pathFixVersion, pathComponent, null);
+            alreadyCopiedFiles = fileOperator.findFiles(pathFixVersion);
+        }
+        fileOperator.copyFiles(pathSource, pathComponent, alreadyCopiedFiles);
         startComponent(pathServer, serviceName);
     }
 
@@ -254,8 +260,8 @@ public class ComponentOperator {
      *
      * @return rollbackDateButtonList
      */
-    public ArrayList<String> getRollbackDates(String pathLastVersion) {
-        ArrayList<String> rollbackDateButtonList = new ArrayList<>();
+    public HashMap<String, String> returnRollbackDates(String pathLastVersion) {
+        HashMap<String, String> rollbackDateButtonList = new HashMap<>();
         File folder = new File(pathLastVersion);
         File[] listOfFiles = folder.listFiles(File::isDirectory);
 
@@ -277,8 +283,8 @@ public class ComponentOperator {
                     s = s + m.group();
                     if (s.length() == 8) {
                         i++;
-                        log.info(s);
-                        rollbackDateButtonList.add(s);
+                        log.info(s + " | " + file.getName());
+                        rollbackDateButtonList.put(s, file.getName());
                     }
                 }
 
