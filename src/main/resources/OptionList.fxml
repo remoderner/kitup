@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Text?>
@@ -18,13 +18,18 @@
           styleClass="title-bar"
           prefHeight="20.0">
         <HBox alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
-            <Label fx:id="titleLabel" text="back / srvTest">
+            <Label fx:id="titleLabel">
                 <HBox.margin>
                     <Insets bottom="5.0" left="10.0" right="10.0" top="5.0"/>
                 </HBox.margin>
             </Label>
         </HBox>
         <HBox alignment="CENTER" prefWidth="20.0">
+            <Label onMouseClicked="#miniWindows" styleClass="mini-button" text="_">
+                <HBox.margin>
+                    <Insets bottom="5.0" left="5.0" top="5.0"/>
+                </HBox.margin>
+            </Label>
             <Label onMouseClicked="#closeWindow" styleClass="close-button" text="X">
                 <HBox.margin>
                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>

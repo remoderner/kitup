@@ -7,7 +7,7 @@
                 lastVersionDirName="D:\foldersource\"
                 componentDirName="D:\foldertarget\"/>
         <component
-                componentName="srvTest2"
+                componentName="srvCommissioner"
                 serviceName="2GISUpdateService"
                 lastVersionDirName="D:\foldersource\srvTest2\"
                 componentDirName="D:\foldertarget\srvTest2\"/>
