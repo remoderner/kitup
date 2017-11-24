@@ -1,0 +1,10 @@
+.button:disabled {
+}
+
+.button {
+    -fx-padding: 0 7 0 7;
+}
+
+.button:hover {
+    -fx-background-color: #98FB98, #66c966, #98FB98;
+}

@@ -20,6 +20,10 @@
     -fx-background-color: #e6e6e6, #c0c0c0, #e6e6e6;
 }
 
+.update:hover {
+
+}
+
 .tab:selected .focus-indicator {
     -fx-focus-color: transparent;
     -fx-border-color: transparent;
@@ -30,8 +34,42 @@
     -fx-font-size: 12px;
 }
 
+.min-button {
+    -fx-font-family: Verdana;
+    -fx-font-size: 14px;
+    -fx-padding: 3px;
+    -fx-border-size: 1px;
+    -fx-border-color: white;
+}
+
+.min-button:hover {
+    -fx-background-color: #84e784, #66c966, #84e784;
+    -fx-background-insets: 1;
+    -fx-background-radius: 2;
+    -fx-border-color: #66c966;
+    -fx-border-radius: 2;
+    -fx-focus-traversable: false;
+}
+
+.mini-button {
+    -fx-font-family: Verdana;
+    -fx-font-size: 14px;
+    -fx-padding: 3px;
+    -fx-border-size: 1px;
+    -fx-border-color: white;
+}
+
+.mini-button:hover {
+    -fx-background-color: #84e784, #66c966, #84e784;
+    -fx-background-insets: 1;
+    -fx-background-radius: 2;
+    -fx-border-color: #66c966;
+    -fx-border-radius: 2;
+    -fx-focus-traversable: false;
+}
+
 .close-button {
-    -fx-font-family: Arial;
+    -fx-font-family: Verdana;
     -fx-font-size: 14px;
     -fx-padding: 3px;
     -fx-border-size: 1px;

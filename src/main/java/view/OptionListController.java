@@ -9,6 +9,8 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -26,6 +28,9 @@ public class OptionListController {
     private static final Logger logger = LogManager.getLogger(OptionListController.class);
     @FXML
     VBox rootVBox;
+
+    @FXML
+    TabPane projectsOverview;
 
     @FXML
     HBox titleHBox;
@@ -71,8 +76,12 @@ public class OptionListController {
     private String pathLastVersion;
     private String pathComponent;
     private String componentName;
+    private String lastComponentVersion;
 
     private Boolean threadIsAlive = true;
+    private Boolean IsMinimized = false;
+
+    private int dialogStageHeight = 330;
 
     private Stage dialogStage;
     private GUIGenerator guiGenerator;
@@ -102,6 +111,31 @@ public class OptionListController {
      */
     @FXML
     private void initialize() {
+        if (update != null) {
+            update.hoverProperty().addListener((obs, wasHovered, isNowHovered) -> {
+                if (isNowHovered) {
+                    update.setText(lastComponentVersion);
+                } else {
+                    update.setText("Update");
+                }
+            });
+        }
+    }
+
+    @FXML
+    public void minWindow(MouseEvent mouseEvent) {
+        dialogStage.setIconified(true);
+    }
+
+    @FXML
+    public void miniWindows(MouseEvent mouseEvent) {
+        if (IsMinimized) {
+            dialogStage.setHeight(dialogStageHeight);
+            IsMinimized = false;
+        } else {
+            dialogStage.setHeight(110);
+            IsMinimized = true;
+        }
     }
 
     @FXML
@@ -124,6 +158,11 @@ public class OptionListController {
         this.dialogStage = dialogStage;
         componentOperator = guiGenerator.getComponentOperator();
         componentOperator.setOptionListController(this);
+    }
+
+    public void setRootData(ArrayList<Tab> projectsList) {
+        projectsOverview.getTabs().addAll(projectsList);
+        titleLabel.setText("kitUP" + " / " + "1.7.6");
     }
 
     public void setComponentData(Project project, Component component) {
@@ -165,7 +204,8 @@ public class OptionListController {
     }
 
     private void setRollbackDates(ArrayList<Button> rollbackDateButtonList) {
-        dialogStage.setHeight(328 + 39 * rollbackDateButtonList.size());
+        dialogStageHeight = dialogStageHeight + 39 * rollbackDateButtonList.size();
+        dialogStage.setHeight(dialogStageHeight);
         rollbackDates.getChildren().addAll(rollbackDateButtonList);
     }
 
@@ -191,7 +231,7 @@ public class OptionListController {
 
         while (threadIsAlive) {
             String currentComponentVersion = componentOperator.getComponentVersion(componentName + ".dll", pathComponent, "FileVersion");
-            String lastComponentVersion = componentOperator.getComponentVersion(componentName + ".dll", pathLastVersion, "FileVersion");
+            lastComponentVersion = componentOperator.getComponentVersion(componentName + ".dll", pathLastVersion, "FileVersion");
             componentVersion.setText(currentComponentVersion);
             //noinspection Duplicates
             if (Objects.equals(currentComponentVersion, lastComponentVersion)) {
@@ -250,7 +290,7 @@ public class OptionListController {
         backqroundThread.setOnSucceeded(event -> {
             update.setDisable(false);
             String currentComponentVersion = componentOperator.getComponentVersion(componentName + ".dll", pathComponent, "FileVersion");
-            String lastComponentVersion = componentOperator.getComponentVersion(componentName + ".dll", pathLastVersion, "FileVersion");
+            lastComponentVersion = componentOperator.getComponentVersion(componentName + ".dll", pathLastVersion, "FileVersion");
             if (Objects.equals(currentComponentVersion, lastComponentVersion)) {
                 update.getStylesheets().clear();
                 update.getStylesheets().add("/ButtonGood.css");
@@ -423,7 +463,7 @@ public class OptionListController {
                             Button button = new Button();
                             Button fixButton = new Button();
 
-                            fixButton.setStyle("-fx-padding: 0 7 0 7");
+                            fixButton.getStylesheets().add("/FixButton.css");
                             fixButton.setText("fix");
                             fixButton.setOnAction(e -> {
                                 button.setDisable(true);
@@ -460,7 +500,7 @@ public class OptionListController {
                                             button.setDisable(false);
                                             isNeedFixVersion[0] = false;
                                             String currentComponentVersion = componentOperator.getComponentVersion(componentName + ".dll", pathComponent, "FileVersion");
-                                            String lastComponentVersion = componentOperator.getComponentVersion(componentName + ".dll", pathLastVersion, "FileVersion");
+                                            lastComponentVersion = componentOperator.getComponentVersion(componentName + ".dll", pathLastVersion, "FileVersion");
                                             componentVersion.setText(currentComponentVersion);
                                             //noinspection Duplicates
                                             if (Objects.equals(currentComponentVersion, lastComponentVersion)) {

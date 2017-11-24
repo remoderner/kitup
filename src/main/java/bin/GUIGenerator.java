@@ -10,12 +10,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import utils.ComponentOperator;
@@ -30,9 +27,8 @@ public class GUIGenerator extends Application {
     private DataGenerator dataGenerator = new DataGenerator("Config.xml");
     private FileOperator fileOpener = new FileOperator();
     private ComponentOperator componentOperator = new ComponentOperator();
+    private Stage rootStage;
 
-    private Stage primaryStage;
-    private BorderPane rootLayout;
     private int maxCountComponents;
     private HashSet<String> openComponentLists = new HashSet<>();
 
@@ -48,47 +44,39 @@ public class GUIGenerator extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) { // Формирование корневого макета
-        this.primaryStage = primaryStage;
-        this.primaryStage.setTitle("kitUP");
-        this.primaryStage.getIcons().add(new Image(this.getClass().getClassLoader().getResourceAsStream("icon.png")));
-        this.primaryStage.setResizable(false);
-
-        initRootLayout(); // Корневой макет
+    public void start(Stage primaryStage) {
+        showRoot(); // Show root stage
     }
 
     /**
-     * Корневой макет
+     * ROOT STAGE
      */
-    private void initRootLayout() {
-        // Загрузка корневого макета
-        rootLayout = new BorderPane();
-        showProjectOverview(); // Проекты
+    private void showRoot() {
+        try {
+            FXMLLoader loader = new FXMLLoader(this.getClass().getClassLoader().getResource("Root.fxml"));
+            VBox page = loader.load();
+            OptionListController optionListController = loader.getController();
 
-        // Отображение сцены, содержащую корневой макет
-        Scene scene = new Scene(rootLayout);
-        scene.getStylesheets().add("/MainStylesheet.css");
-        primaryStage.setScene(scene);
-        primaryStage.show();
-    }
+            rootStage = new Stage();
+            rootStage.initStyle(StageStyle.TRANSPARENT);
+            rootStage.setResizable(false);
+            rootStage.setTitle("kitUP" + " / " + "1.7.6");
+            rootStage.getIcons().add(new Image(this.getClass().getClassLoader().getResourceAsStream("icon.png")));
 
-    /**
-     * Проекты
-     */
-    private void showProjectOverview() {
-        // Инициализация
-        TabPane projectsOverview = new TabPane();
+            rootStage.focusedProperty().addListener((ov, t, t1) -> optionListController.windowFocused(t1));
 
-        // Настройка
-        projectsOverview.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-        projectsOverview.setMinWidth(200);
+            Scene scene = new Scene(page);
+            scene.getStylesheets().add("/MainStylesheet.css");
+            rootStage.setScene(scene);
 
-        // Загрузка данных по проектам
-        projectsOverview.getTabs().addAll(getProjectList());
+            // Передача настройки в контроллер
+            optionListController.setGuiGenerator(this, rootStage);
+            optionListController.setRootData(getProjectsList());
 
-        // Отправить макет проектов в корневой макет
-        rootLayout.setMinSize(200, 60 + 37 * maxCountComponents);
-        rootLayout.setCenter(projectsOverview);
+            rootStage.show();
+        } catch (IOException e) {
+            System.err.println("Could not load Root :" + e.toString());
+        }
     }
 
     /**
@@ -96,36 +84,34 @@ public class GUIGenerator extends Application {
      *
      * @return projectList
      */
-    private ArrayList<Tab> getProjectList() { // Формирование закладок
+    private ArrayList<Tab> getProjectsList() { // Формирование закладок
         ArrayList<Tab> projectList = new ArrayList<>();
 
         for (int i = 0; i < dataGenerator.getProjects().size(); i++) {
-            // Инициализация
             Tab tab = new Tab();
             AnchorPane tabRootPane = new AnchorPane();
             VBox leftVBox = new VBox();
             VBox rightVBox = new VBox();
 
-            // Настройка
             tab.setText(dataGenerator.getProjects().get(i).getProjectName());
 
-            leftVBox.getChildren().addAll(getComponentList(dataGenerator.getProjects().get(i), dataGenerator.getProjects().get(i).getComponents()));
+            leftVBox.getChildren().addAll(getComponentOptionList(dataGenerator.getProjects().get(i), dataGenerator.getProjects().get(i).getComponents()));
             leftVBox.setSpacing(10);
-            AnchorPane.setLeftAnchor(leftVBox, 20.0);
-            AnchorPane.setTopAnchor(leftVBox, 20.0);
-            AnchorPane.setRightAnchor(leftVBox, 7.0);
+            AnchorPane.setLeftAnchor(leftVBox, 25.0);
+            AnchorPane.setTopAnchor(leftVBox, 25.0);
+            AnchorPane.setRightAnchor(leftVBox, 25.0);
+            AnchorPane.setBottomAnchor(leftVBox, 25.0);
 
-            rightVBox.getChildren().addAll(getComponentOptionList(dataGenerator.getProjects().get(i), dataGenerator.getProjects().get(i).getComponents()));
-            rightVBox.setMaxWidth(24);
-            rightVBox.setSpacing(10);
-            AnchorPane.setRightAnchor(rightVBox, 7.0);
-            AnchorPane.setTopAnchor(rightVBox, 20.0);
+            //rightVBox.getChildren().addAll(getComponentOptionList(dataGenerator.getProjects().get(i), dataGenerator.getProjects().get(i).getComponents()));
+            //rightVBox.setMaxWidth(30);
+            //rightVBox.setSpacing(10);
+            //AnchorPane.setRightAnchor(rightVBox, 25.0);
+            //AnchorPane.setTopAnchor(rightVBox, 25.0);
+            //AnchorPane.setBottomAnchor(rightVBox, 25.0);
 
-            // Отправить
             tabRootPane.getChildren().addAll(leftVBox, rightVBox);
             tab.setContent(tabRootPane);
 
-            // Добавление проекта в список
             projectList.add(tab);
         }
         return projectList;
@@ -181,8 +167,8 @@ public class GUIGenerator extends Application {
 
         for (Component component : components) {
             Button moreOptionsButton = new Button();
-            moreOptionsButton.setText("");
-            moreOptionsButton.setPrefWidth(14);
+            moreOptionsButton.setText(component.getComponentName());
+            moreOptionsButton.setMinWidth(150);
             moreOptionsButton.setOnAction(
                     (ActionEvent event) -> {
                         if (!openComponentLists.contains(project.getProjectName() + "." + component.getComponentName())) {
@@ -208,16 +194,19 @@ public class GUIGenerator extends Application {
 
             Stage dialogStage = new Stage();
             dialogStage.setAlwaysOnTop(true);
-            dialogStage.initModality(Modality.NONE);
             dialogStage.initStyle(StageStyle.TRANSPARENT);
             dialogStage.initOwner(null);
             dialogStage.setResizable(false);
+            dialogStage.setTitle(project.getProjectName() + " / " + component.getComponentName());
+            dialogStage.getIcons().add(new Image(this.getClass().getClassLoader().getResourceAsStream("icon.png")));
+            dialogStage.setX(rootStage.getX() + rootStage.getWidth());
+            dialogStage.setY(rootStage.getY());
 
             dialogStage.focusedProperty().addListener((ov, t, t1) -> optionListController.windowFocused(t1));
 
             dialogStage.setOnHiding(e -> {
                 openComponentLists.remove(project.getProjectName() + "." + component.getComponentName());
-                optionListController.threadIsDead(); //Окно закрыто и все порожденные потоки останавливаются
+                optionListController.threadIsDead(); //Окно закрыто и все порожденные сервисы мониторинга останавливаются
             });
 
             Scene scene = new Scene(page);
