@@ -1,7 +1,15 @@
 package bin;
 
 import classroom.Component;
+import classroom.KitupConfig;
 import classroom.Project;
+import classroom.Server;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.*;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.string.StringDecoder;
 import javafx.application.Application;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
@@ -15,8 +23,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import utils.ComponentOperator;
-import utils.FileOperator;
+import utils.*;
 import view.OptionListController;
 
 import java.io.IOException;
@@ -24,12 +31,18 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 public class GUIGenerator extends Application {
-    private DataGenerator dataGenerator = new DataGenerator("Config.xml");
+    private final String HOST = "localhost";
+    private final int PORT = 3301;
+    private KitupConfig kitupConfig = KitupConfig.getKitupConfig();
     private FileOperator fileOpener = new FileOperator();
     private ComponentOperator componentOperator = new ComponentOperator();
+    private ServerOperator serverOperator = new ServerOperator();
+    private ServiceOperator serviceOperator = new ServiceOperator();
     private Stage rootStage;
-
-    private int maxCountComponents;
+    /**
+     * Client-server features
+     */
+    private EventLoopGroup workerGroup;
     private HashSet<String> openComponentLists = new HashSet<>();
 
     public GUIGenerator() {
@@ -37,6 +50,14 @@ public class GUIGenerator extends Application {
 
     public ComponentOperator getComponentOperator() {
         return componentOperator;
+    }
+
+    public ServerOperator getServerOperator() {
+        return serverOperator;
+    }
+
+    public ServiceOperator getServiceOperator() {
+        return serviceOperator;
     }
 
     public FileOperator getFileOpener() {
@@ -60,7 +81,7 @@ public class GUIGenerator extends Application {
             rootStage = new Stage();
             rootStage.initStyle(StageStyle.TRANSPARENT);
             rootStage.setResizable(false);
-            rootStage.setTitle("kitUP" + " / " + "1.7.6");
+            rootStage.setTitle("kitUP" + " / " + "1.8.5");
             rootStage.getIcons().add(new Image(this.getClass().getClassLoader().getResourceAsStream("icon.png")));
 
             rootStage.focusedProperty().addListener((ov, t, t1) -> optionListController.windowFocused(t1));
@@ -87,15 +108,16 @@ public class GUIGenerator extends Application {
     private ArrayList<Tab> getProjectsList() { // Формирование закладок
         ArrayList<Tab> projectList = new ArrayList<>();
 
-        for (int i = 0; i < dataGenerator.getProjects().size(); i++) {
+        for (int i = 0; i < kitupConfig.getProjects().size(); i++) {
             Tab tab = new Tab();
             AnchorPane tabRootPane = new AnchorPane();
             VBox leftVBox = new VBox();
             VBox rightVBox = new VBox();
 
-            tab.setText(dataGenerator.getProjects().get(i).getProjectName());
+            tab.setText(kitupConfig.getProjects().get(i).getProjectName());
 
-            leftVBox.getChildren().addAll(getComponentOptionList(dataGenerator.getProjects().get(i), dataGenerator.getProjects().get(i).getComponents()));
+            leftVBox.getChildren().addAll(getServerOptionList(kitupConfig.getProjects().get(i), kitupConfig.getProjects().get(i).getServers()));
+            leftVBox.getChildren().addAll(getComponentOptionList(kitupConfig.getProjects().get(i), kitupConfig.getProjects().get(i).getComponents()));
             leftVBox.setSpacing(10);
             AnchorPane.setLeftAnchor(leftVBox, 25.0);
             AnchorPane.setTopAnchor(leftVBox, 25.0);
@@ -118,16 +140,48 @@ public class GUIGenerator extends Application {
     }
 
     /**
+     * Возвращает список серверов для проекта
+     *
+     * @return serverList
+     */
+    private ArrayList<Button> getServerList(Project project, ArrayList<Server> servers) { // Формирование кнопок серверов
+        ArrayList<Button> serverList = new ArrayList<>();
+
+        for (Server server : servers) {
+            Button button = new Button();
+            button.setText(server.getServerName());
+            button.setMinWidth(150);
+            button.setOnAction(
+                    (e) -> {
+                        button.setDisable(true);
+
+                        Service backqroundThread = new Service<Void>() {
+                            protected Task<Void> createTask() {
+                                return new Task<>() {
+                                    protected Void call() {
+                                        //componentOperator.updateServer(project.getServerName(), server.getServiceNameQortes(), server.getServiceNameQortesDB(), server.getLastVersionDirName(), server.getServerDirName());
+                                        return null;
+                                    }
+                                };
+                            }
+                        };
+
+                        backqroundThread.setOnSucceeded(event -> button.setDisable(false));
+                        backqroundThread.restart();
+                    }
+            );
+            serverList.add(button);
+        }
+        return serverList;
+    }
+
+    /**
      * Возвращает список компонент для проекта
      *
      * @return componentList
      */
-    private ArrayList<Button> getComponentList(Project project, ArrayList<Component> components) { // Формирование кнопок
+    private ArrayList<Button> getComponentList(Project project, ArrayList<Component> components) { // Формирование кнопок компонент
         ArrayList<Button> componentList = new ArrayList<>();
-
-        if (maxCountComponents < components.size()) {
-            maxCountComponents = components.size();
-        }
 
         for (Component component : components) {
             Button button = new Button();
@@ -160,6 +214,31 @@ public class GUIGenerator extends Application {
     /**
      * Возвращает список дополнительных опций для компоненты
      *
+     * @return serverOptionList
+     */
+    private ArrayList<Button> getServerOptionList(Project project, ArrayList<Server> servers) {
+        ArrayList<Button> componentOptionList = new ArrayList<>();
+
+        for (Server server : servers) {
+            Button moreOptionsButton = new Button();
+            moreOptionsButton.setText(server.getServerName());
+            moreOptionsButton.setMinWidth(150);
+            moreOptionsButton.setOnAction(
+                    (ActionEvent event) -> {
+                        if (!openComponentLists.contains(project.getProjectName() + "." + server.getServerName())) {
+                            openComponentLists.add(project.getProjectName() + "." + server.getServerName());
+                            ShowServerOptionList(project, server);
+                        }
+                    });
+
+            componentOptionList.add(moreOptionsButton);
+        }
+        return componentOptionList;
+    }
+
+    /**
+     * Возвращает список дополнительных опций для компоненты
+     *
      * @return componentOptionList
      */
     private ArrayList<Button> getComponentOptionList(Project project, ArrayList<Component> components) {
@@ -173,7 +252,7 @@ public class GUIGenerator extends Application {
                     (ActionEvent event) -> {
                         if (!openComponentLists.contains(project.getProjectName() + "." + component.getComponentName())) {
                             openComponentLists.add(project.getProjectName() + "." + component.getComponentName());
-                            ShowOptionList(project, component);
+                            ShowComponentOptionList(project, component);
                         }
                     });
 
@@ -182,15 +261,95 @@ public class GUIGenerator extends Application {
         return componentOptionList;
     }
 
+    private void connectToServer(Project project, Component component) {
+        workerGroup = new NioEventLoopGroup();
+
+        Task<Channel> task = new Task<>() {
+
+            @Override
+            protected Channel call() throws Exception {
+
+                try {
+                    Bootstrap b = new Bootstrap();
+                    b
+                            .group(workerGroup)
+                            .channel(NioSocketChannel.class)
+                            .handler(new ChannelInitializer<SocketChannel>() {
+                                @Override
+                                protected void initChannel(SocketChannel ch) {
+                                    System.out.println("initChannel");
+                                    final ChannelPipeline pipeline = ch.pipeline();
+                                    pipeline.addLast(
+                                            new StringDecoder(),
+                                            new ClientHandler(project.getProjectName(), component.getComponentName(), "vladiv"));
+                                }
+                            });
+
+                    System.out.println("Start client to host: " + HOST + ":" + PORT);
+                    ChannelFuture f = b.connect(HOST, PORT).sync();
+                    f.channel().closeFuture().sync();
+                } finally {
+                    //workerGroup.shutdownGracefully();
+                }
+
+                return null;
+            }
+        };
+
+        new Thread(task).start();
+    }
+
+    /**
+     * Открыть диалоговое окно дополнительных опций сервера
+     */
+    private void ShowServerOptionList(Project project, Server server) {
+        try {
+            // Загрузить fxml-файл для создания новой сцены для окна
+            FXMLLoader loader = new FXMLLoader(this.getClass().getClassLoader().getResource("ServerOptionList.fxml"));
+            VBox page = loader.load();
+            OptionListController optionListController = loader.getController();
+
+            Stage dialogStage = new Stage();
+            dialogStage.setAlwaysOnTop(true);
+            dialogStage.initStyle(StageStyle.TRANSPARENT);
+            dialogStage.initOwner(null);
+            dialogStage.setResizable(false);
+            dialogStage.setTitle(project.getProjectName() + " / " + server.getServerName());
+            dialogStage.getIcons().add(new Image(this.getClass().getClassLoader().getResourceAsStream("icon.png")));
+            dialogStage.setX(rootStage.getX() + rootStage.getWidth());
+            dialogStage.setY(rootStage.getY());
+
+            dialogStage.focusedProperty().addListener((ov, t, t1) -> optionListController.windowFocused(t1));
+
+            dialogStage.setOnHiding(e -> {
+                openComponentLists.remove(project.getProjectName() + "." + server.getServerName());
+                optionListController.threadIsDead(); //Окно закрыто и все порожденные сервисы мониторинга останавливаются
+                //workerGroup.shutdownGracefully(); //Закрывается подключение к серверу
+            });
+
+            Scene scene = new Scene(page);
+            dialogStage.setScene(scene);
+
+            // Передача настройки в контроллер
+            optionListController.setGuiGenerator(this, dialogStage);
+            optionListController.setServerData(project, server);
+            //connectToServer(project, component); //Открывается подключение к серверу
+
+            dialogStage.show();
+        } catch (IOException e) {
+            System.err.println("Could not load OptionList :" + e.toString());
+        }
+    }
+
     /**
      * Открыть диалоговое окно дополнительных опций компоненты
      */
-    private void ShowOptionList(Project project, Component component) {
+    private void ShowComponentOptionList(Project project, Component component) {
         try {
             // Загрузить fxml-файл для создания новой сцены для окна
-            FXMLLoader loader = new FXMLLoader(this.getClass().getClassLoader().getResource("OptionList.fxml"));
-            VBox page = loader.load();
-            OptionListController optionListController = loader.getController();
+            FXMLLoader loaderOptionList = new FXMLLoader(this.getClass().getClassLoader().getResource("OptionList.fxml"));
+            VBox page = loaderOptionList.load();
+            OptionListController optionListController = loaderOptionList.getController();
 
             Stage dialogStage = new Stage();
             dialogStage.setAlwaysOnTop(true);
@@ -207,6 +366,7 @@ public class GUIGenerator extends Application {
             dialogStage.setOnHiding(e -> {
                 openComponentLists.remove(project.getProjectName() + "." + component.getComponentName());
                 optionListController.threadIsDead(); //Окно закрыто и все порожденные сервисы мониторинга останавливаются
+                //workerGroup.shutdownGracefully(); //Закрывается подключение к серверу
             });
 
             Scene scene = new Scene(page);
@@ -215,6 +375,7 @@ public class GUIGenerator extends Application {
             // Передача настройки в контроллер
             optionListController.setGuiGenerator(this, dialogStage);
             optionListController.setComponentData(project, component);
+            //connectToServer(project, component); //Открывается подключение к серверу
 
             dialogStage.show();
         } catch (IOException e) {

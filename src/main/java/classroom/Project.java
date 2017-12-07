@@ -7,6 +7,7 @@ public class Project {
     private String serverName;
     private String salesDirName;
     private ArrayList<Component> components = new ArrayList<>();
+    private ArrayList<Server> servers = new ArrayList<>();
 
     public String getProjectName() {
         return projectName;
@@ -38,5 +39,13 @@ public class Project {
 
     public void setComponents(Component component) {
         this.components.add(component);
+    }
+
+    public ArrayList<Server> getServers() {
+        return servers;
+    }
+
+    public void setServers(Server server) {
+        this.servers.add(server);
     }
 }

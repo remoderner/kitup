@@ -2,6 +2,7 @@ package bin;
 
 import classroom.Component;
 import classroom.Project;
+import classroom.Server;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -11,16 +12,37 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 
-class DataGenerator {
+public class DataGenerator {
     private ArrayList<Project> projects = new ArrayList<>();
+    private ArrayList<String> ignoreByFileNameListOnUpdate;
+    private ArrayList<String> ignoreByFileTypeListOnUpdate;
+    private ArrayList<String> ignoreByFileNameListOnRollback;
+    private ArrayList<String> ignoreByFileTypeListOnRollback;
 
-    DataGenerator(String configFileName) {
+    public DataGenerator(String configFileName) {
         fromXML(configFileName);
     }
 
-    ArrayList<Project> getProjects() {
+    public ArrayList<Project> getProjects() {
         return projects;
+    }
+
+    public ArrayList<String> getIgnoreByFileNameListOnUpdate() {
+        return ignoreByFileNameListOnUpdate;
+    }
+
+    public ArrayList<String> getIgnoreByFileTypeListOnUpdate() {
+        return ignoreByFileTypeListOnUpdate;
+    }
+
+    public ArrayList<String> getIgnoreByFileNameListOnRollback() {
+        return ignoreByFileNameListOnRollback;
+    }
+
+    public ArrayList<String> getIgnoreByFileTypeListOnRollback() {
+        return ignoreByFileTypeListOnRollback;
     }
 
     private void fromXML(String configFileName) { //Загрузка и чтение настроек из xml-файла
@@ -33,12 +55,13 @@ class DataGenerator {
             Document doc = dBuilder.parse(xmlFile);
 
             doc.getDocumentElement().normalize();
-            NodeList projectList = doc.getElementsByTagName("project");
+            NodeList projectsList = doc.getElementsByTagName("project");
+            NodeList configsList = doc.getElementsByTagName("config");
 
-            for (int i = 0; i < projectList.getLength(); i++) { //Чтение и запись данных по проектам
+            for (int i = 0; i < projectsList.getLength(); i++) { //Чтение и запись данных по проектам
                 Project project = new Project();
-                Node nProject = projectList.item(i);
-                NodeList componentList = nProject.getChildNodes();
+                Node nProject = projectsList.item(i);
+                NodeList nodeList = nProject.getChildNodes();
 
                 if (nProject.getNodeType() == Node.ELEMENT_NODE) {
                     Element eProject = (Element) nProject;
@@ -47,21 +70,56 @@ class DataGenerator {
                     project.setSalesDirName(eProject.getAttribute("salesDirName"));
                 }
 
-                for (int x = 0; x < componentList.getLength(); x++) { //Чтение и запись данных по компонентам проекта
-                    Component component = new Component();
-                    Node nComponent = componentList.item(x);
+                for (int x = 0; x < nodeList.getLength(); x++) { //Чтение и запись данных по компонентам проекта
+                    Node nComponent = nodeList.item(x);
 
                     if (nComponent.getNodeType() == Node.ELEMENT_NODE) {
-                        Element eComponent = (Element) nComponent;
-                        component.setComponentName(eComponent.getAttribute("componentName"));
-                        component.setServiceName(eComponent.getAttribute("serviceName"));
-                        component.setLastVersionDirName(eComponent.getAttribute("lastVersionDirName"));
-                        component.setComponentDirName(eComponent.getAttribute("componentDirName"));
-                        project.setComponents(component);
+                        if (nComponent.getNodeName().contains("component")) {
+                            Component component = new Component();
+                            Element eComponent = (Element) nComponent;
+                            component.setComponentName(eComponent.getAttribute("componentName"));
+                            component.setServiceName(eComponent.getAttribute("serviceName"));
+                            component.setLastVersionDirName(eComponent.getAttribute("lastVersionDirName"));
+                            component.setComponentDirName(eComponent.getAttribute("componentDirName"));
+                            project.setComponents(component);
+                        } else if (nComponent.getNodeName().contains("server")) {
+                            Server server = new Server();
+                            Element eComponent = (Element) nComponent;
+                            server.setServerName(eComponent.getAttribute("serverName"));
+                            server.setServiceNameQortes(eComponent.getAttribute("serviceNameQortes"));
+                            server.setServiceNameQortesDB(eComponent.getAttribute("serviceNameQortesDB"));
+                            server.setExeNameQortes(eComponent.getAttribute("exeNameQortes"));
+                            server.setExeNameQortesDB(eComponent.getAttribute("exeNameQortesDB"));
+                            server.setLastVersionDirName(eComponent.getAttribute("lastVersionDirName"));
+                            server.setServerDirName(eComponent.getAttribute("serverDirName"));
+                            project.setServers(server);
+                        }
                     }
                 }
                 projects.add(project);
             }
+
+            for (int i = 0; i < configsList.getLength(); i++) {
+                Node nConfig = configsList.item(i);
+                NodeList nodeList = nConfig.getChildNodes();
+
+                for (int x = 0; x < nodeList.getLength(); x++) {
+                    Node nConfigType = nodeList.item(x);
+
+                    if (nConfigType.getNodeType() == Node.ELEMENT_NODE) {
+                        if (nConfigType.getNodeName().contains("ignoredCopyFilesOnUpdate")) {
+                            Element eConfigType = (Element) nConfigType;
+                            ignoreByFileNameListOnUpdate = new ArrayList<>(Arrays.asList(eConfigType.getAttribute("ignoreByFileName").split(",")));
+                            ignoreByFileTypeListOnUpdate = new ArrayList<>(Arrays.asList(eConfigType.getAttribute("ignoreByFileType").split(",")));
+                        } else if (nConfigType.getNodeName().contains("ignoredCopyFilesOnRollback")) {
+                            Element eConfigType = (Element) nConfigType;
+                            ignoreByFileNameListOnRollback = new ArrayList<>(Arrays.asList(eConfigType.getAttribute("ignoreByFileName").split(",")));
+                            ignoreByFileTypeListOnRollback = new ArrayList<>(Arrays.asList(eConfigType.getAttribute("ignoreByFileType").split(",")));
+                        }
+                    }
+                }
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }

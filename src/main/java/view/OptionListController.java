@@ -3,10 +3,13 @@ package view;
 import bin.GUIGenerator;
 import classroom.Component;
 import classroom.Project;
+import classroom.Server;
 import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
@@ -14,20 +17,31 @@ import javafx.scene.control.TabPane;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import utils.ComponentOperator;
+import utils.ServerOperator;
+import utils.ServiceOperator;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
 
 public class OptionListController {
     private static final Logger logger = LogManager.getLogger(OptionListController.class);
+
     @FXML
     VBox rootVBox;
+
+    @FXML
+    VBox contentVBox;
+
+    @FXML
+    HBox contentHBox;
 
     @FXML
     TabPane projectsOverview;
@@ -42,15 +56,19 @@ public class OptionListController {
 
     @FXML
     private Button update;
+    private Button updateMin = new Button();
 
     @FXML
     private Button restart;
+    private Button restartMin = new Button();
 
     @FXML
     private Button start;
+    private Button startMin = new Button();
 
     @FXML
     private Button stop;
+    private Button stopMin = new Button();
 
     @FXML
     private Button ini;
@@ -70,6 +88,12 @@ public class OptionListController {
     @FXML
     private Text componentVersion;
 
+    private String mainCSS = "/MainStylesheet.css";
+    private String buttonGoodCSS = "/ButtonGood.css";
+    private String buttonWarningCSS = "/ButtonWarning.css";
+    private String buttonStartCSS = "/ButtonStart.css";
+    private String buttonStopCSS = "/ButtonStop.css";
+
     private String pathServer;
     private String pathSales;
     private String serviceName;
@@ -77,17 +101,28 @@ public class OptionListController {
     private String pathComponent;
     private String componentName;
     private String lastComponentVersion;
+    private String serviceNameQortes;
+    private String serviceNameQortesDB;
+    private String exeNameQortesDB;
+    private String exeNameQortes;
+    private String pathServerDir;
+    private String serverName;
 
     private Boolean threadIsAlive = true;
-    private Boolean IsMinimized = false;
+    private Boolean isMinimized = false;
+    private Boolean isEntered = false;
+    private Boolean isStoped = false;
 
-    private int dialogStageHeight = 330;
+    private int dialogStageDefaultHeight = 330;
+    private int dialogStageHeight = dialogStageDefaultHeight;
 
     private Stage dialogStage;
     private GUIGenerator guiGenerator;
     private ComponentOperator componentOperator;
+    private ServerOperator serverOperator;
+    private ServiceOperator serviceOperator;
 
-    public OptionListController() {
+    public OptionListController() throws IOException {
     }
 
     public void threadIsDead() {
@@ -97,11 +132,15 @@ public class OptionListController {
 
     public void windowFocused(Boolean isWindowFocused) {
         if (isWindowFocused) {
-            rootVBox.setStyle("-fx-border-color: #5accff");
-            titleLabel.setStyle("-fx-text-fill: black");
+            if (!isMinimized) {
+                rootVBox.setStyle("-fx-border-color: #5accff");
+                titleLabel.setStyle("-fx-text-fill: black");
+            }
         } else {
-            rootVBox.setStyle("-fx-border-color: #c0c0c0");
-            titleLabel.setStyle("-fx-text-fill: gray");
+            if (!isMinimized) {
+                rootVBox.setStyle("-fx-border-color: #c0c0c0");
+                titleLabel.setStyle("-fx-text-fill: gray");
+            }
         }
     }
 
@@ -111,10 +150,12 @@ public class OptionListController {
      */
     @FXML
     private void initialize() {
-        if (update != null) {
+        if (update != null) { // Last version when hovered on update button
             update.hoverProperty().addListener((obs, wasHovered, isNowHovered) -> {
                 if (isNowHovered) {
-                    update.setText(lastComponentVersion);
+                    if (!lastComponentVersion.equals("0.0.0.0")) {
+                        update.setText(lastComponentVersion);
+                    }
                 } else {
                     update.setText("Update");
                 }
@@ -128,14 +169,42 @@ public class OptionListController {
     }
 
     @FXML
-    public void miniWindows(MouseEvent mouseEvent) {
-        if (IsMinimized) {
+    public void miniWindows(MouseEvent mouseEvent) throws IOException {
+        if (isMinimized) {
             dialogStage.setHeight(dialogStageHeight);
-            IsMinimized = false;
+            getMinimizedButtons(false);
+            isMinimized = false;
         } else {
             dialogStage.setHeight(110);
-            IsMinimized = true;
+            getMinimizedButtons(true);
+            isMinimized = true;
         }
+    }
+
+    @FXML
+    public void setOnEntered(MouseEvent event) {
+        if (isMinimized) {
+            dialogStage.setHeight(110);
+            titleHBox.getStylesheets().clear();
+            titleHBox.getStylesheets().add(mainCSS);
+        }
+        isEntered = true;
+    }
+
+    @FXML
+    public void setOnExited(MouseEvent event) {
+        if (isMinimized) {
+            if (isStoped) {
+                dialogStage.setHeight(38);
+                titleHBox.getStylesheets().clear();
+                titleHBox.getStylesheets().add(buttonStopCSS);
+            } else {
+                dialogStage.setHeight(38);
+                titleHBox.getStylesheets().clear();
+                titleHBox.getStylesheets().add(update.getStylesheets().get(0));
+            }
+        }
+        isEntered = false;
     }
 
     @FXML
@@ -157,12 +226,58 @@ public class OptionListController {
         this.guiGenerator = guiGenerator;
         this.dialogStage = dialogStage;
         componentOperator = guiGenerator.getComponentOperator();
+        serverOperator = guiGenerator.getServerOperator();
+        serviceOperator = guiGenerator.getServiceOperator();
+        componentOperator.setServiceOperator(serviceOperator);
         componentOperator.setOptionListController(this);
+        serverOperator.setServiceOperator(serviceOperator);
+        serverOperator.setOptionListController(this);
     }
 
     public void setRootData(ArrayList<Tab> projectsList) {
         projectsOverview.getTabs().addAll(projectsList);
-        titleLabel.setText("kitUP" + " / " + "1.7.6");
+        titleLabel.setText("kitUP" + " / " + "1.8.5");
+    }
+
+    public void setServerData(Project project, Server server) {
+        pathServer = project.getServerName();
+        pathSales = project.getSalesDirName();
+        serviceNameQortes = server.getServiceNameQortes();
+        serviceNameQortesDB = server.getServiceNameQortesDB();
+        exeNameQortes = server.getExeNameQortes();
+        exeNameQortesDB = server.getExeNameQortesDB();
+        pathLastVersion = server.getLastVersionDirName();
+        pathServerDir = server.getServerDirName();
+        serverName = server.getServerName();
+        titleLabel.setText(project.getProjectName() + " / " + serverName);
+
+        Service threadMCV = new Service<Void>() {
+            @Override
+            protected Task<Void> createTask() {
+                return new Task<>() {
+                    @Override
+                    protected Void call() {
+                        monitorServerVersion();
+                        return null;
+                    }
+                };
+            }
+        };
+        threadMCV.start();
+
+        Service threadMCS = new Service<Void>() {
+            @Override
+            protected Task<Void> createTask() {
+                return new Task<>() {
+                    @Override
+                    protected Void call() {
+                        monitorServerState();
+                        return null;
+                    }
+                };
+            }
+        };
+        threadMCS.start();
     }
 
     public void setComponentData(Project project, Component component) {
@@ -204,7 +319,7 @@ public class OptionListController {
     }
 
     private void setRollbackDates(ArrayList<Button> rollbackDateButtonList) {
-        dialogStageHeight = dialogStageHeight + 39 * rollbackDateButtonList.size();
+        dialogStageHeight = dialogStageDefaultHeight + 39 * rollbackDateButtonList.size();
         dialogStage.setHeight(dialogStageHeight);
         rollbackDates.getChildren().addAll(rollbackDateButtonList);
     }
@@ -217,7 +332,22 @@ public class OptionListController {
             componentStateNotificator("auto");
 
             try {
-                Thread.sleep(15000);
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                logger.warn("WARNING: " + e.toString());
+            }
+        }
+    }
+
+    /**
+     * MONITORING SERVER - START/STOP
+     */
+    private void monitorServerState() {
+        while (threadIsAlive) {
+            serverStateNotificator("auto");
+
+            try {
+                Thread.sleep(10000);
             } catch (InterruptedException e) {
                 logger.warn("WARNING: " + e.toString());
             }
@@ -236,10 +366,68 @@ public class OptionListController {
             //noinspection Duplicates
             if (Objects.equals(currentComponentVersion, lastComponentVersion)) {
                 update.getStylesheets().clear();
-                update.getStylesheets().add("/ButtonGood.css");
+                updateMin.getStylesheets().clear();
+                update.getStylesheets().add(buttonGoodCSS);
+                updateMin.getStylesheets().add(buttonGoodCSS);
             } else {
                 update.getStylesheets().clear();
-                update.getStylesheets().add("/ButtonWarning.css");
+                updateMin.getStylesheets().clear();
+                update.getStylesheets().add(buttonWarningCSS);
+                updateMin.getStylesheets().add(buttonWarningCSS);
+            }
+
+            if (isMinimized) {
+                if (!isEntered) {
+                    if (!isStoped) {
+                        titleHBox.getStylesheets().clear();
+                        titleHBox.getStylesheets().add(update.getStylesheets().get(0));
+                    } else {
+                        titleHBox.getStylesheets().clear();
+                        titleHBox.getStylesheets().add(buttonStopCSS);
+                    }
+                }
+            }
+
+            try {
+                Thread.sleep(30000);
+            } catch (InterruptedException e) {
+                logger.warn("WARNING: " + e.toString());
+            }
+        }
+    }
+
+    /**
+     * MONITORING SERVER - VERSION
+     */
+    private void monitorServerVersion() {
+
+        while (threadIsAlive) {
+            String currentComponentVersion = componentOperator.getComponentVersion(componentName + ".dll", pathComponent, "FileVersion");
+            lastComponentVersion = componentOperator.getComponentVersion(componentName + ".dll", pathLastVersion, "FileVersion");
+            componentVersion.setText(currentComponentVersion);
+            //noinspection Duplicates
+            if (Objects.equals(currentComponentVersion, lastComponentVersion)) {
+                update.getStylesheets().clear();
+                updateMin.getStylesheets().clear();
+                update.getStylesheets().add(buttonGoodCSS);
+                updateMin.getStylesheets().add(buttonGoodCSS);
+            } else {
+                update.getStylesheets().clear();
+                updateMin.getStylesheets().clear();
+                update.getStylesheets().add(buttonWarningCSS);
+                updateMin.getStylesheets().add(buttonWarningCSS);
+            }
+
+            if (isMinimized) {
+                if (!isEntered) {
+                    if (!isStoped) {
+                        titleHBox.getStylesheets().clear();
+                        titleHBox.getStylesheets().add(update.getStylesheets().get(0));
+                    } else {
+                        titleHBox.getStylesheets().clear();
+                        titleHBox.getStylesheets().add(buttonStopCSS);
+                    }
+                }
             }
 
             try {
@@ -257,7 +445,51 @@ public class OptionListController {
         Boolean serviceRunning = false;
 
         if (state.equals("auto")) {
-            serviceRunning = componentOperator.checkServiceState(pathServer, serviceName, "RUNNING");
+            serviceRunning = serviceOperator.checkServiceState(pathServer, serviceName, "RUNNING");
+        }
+
+        if ((serviceRunning && state.equals("auto")) || state.equals("start")) { //If service running
+            stop.getStylesheets().clear();
+            stopMin.getStylesheets().clear();
+            start.getStylesheets().clear();
+            startMin.getStylesheets().clear();
+            start.getStylesheets().add(buttonStartCSS);
+            startMin.getStylesheets().add(buttonStartCSS);
+            if (isMinimized) {
+                if (!isEntered) {
+                    titleHBox.getStylesheets().clear();
+                    titleHBox.getStylesheets().add(buttonStartCSS);
+                }
+            }
+            isStoped = false;
+        } else {
+            start.getStylesheets().clear();
+            startMin.getStylesheets().clear();
+            stop.getStylesheets().clear();
+            stopMin.getStylesheets().clear();
+            stop.getStylesheets().add(buttonStopCSS);
+            stopMin.getStylesheets().add(buttonStopCSS);
+            if (isMinimized) {
+                if (!isEntered) {
+                    titleHBox.getStylesheets().clear();
+                    titleHBox.getStylesheets().add(buttonStopCSS);
+                }
+            }
+            isStoped = true;
+        }
+    }
+
+    /**
+     * SERVER STATE NOTIFICATOR
+     */
+    public void serverStateNotificator(String state) {
+        Boolean serviceRunning = false;
+
+        if (state.equals("auto")) {
+            serviceRunning = serviceOperator.checkServiceState(pathServer, serviceNameQortes, "RUNNING");
+            if (serviceRunning) {
+                serviceRunning = serviceOperator.checkServiceState(pathServer, serviceNameQortesDB, "RUNNING");
+            }
         }
 
         if ((serviceRunning && state.equals("auto")) || state.equals("start")) { //Если служба запущена
@@ -272,7 +504,7 @@ public class OptionListController {
     }
 
     /**
-     * UPDATE
+     * UPDATE COMPONENT
      */
     @FXML
     private void updateComponent() {
@@ -288,18 +520,51 @@ public class OptionListController {
         };
 
         backqroundThread.setOnSucceeded(event -> {
-            update.setDisable(false);
             String currentComponentVersion = componentOperator.getComponentVersion(componentName + ".dll", pathComponent, "FileVersion");
             lastComponentVersion = componentOperator.getComponentVersion(componentName + ".dll", pathLastVersion, "FileVersion");
             if (Objects.equals(currentComponentVersion, lastComponentVersion)) {
                 update.getStylesheets().clear();
-                update.getStylesheets().add("/ButtonGood.css");
+                updateMin.getStylesheets().clear();
+                update.getStylesheets().add(buttonGoodCSS);
+                updateMin.getStylesheets().add(buttonGoodCSS);
+
+                if (isMinimized) {
+                    if (!isEntered) {
+                        titleHBox.getStylesheets().clear();
+                        titleHBox.getStylesheets().add(buttonGoodCSS);
+                    }
+                }
             }
+            update.setDisable(false);
+            updateMin.setDisable(false);
             componentVersion.setText(currentComponentVersion);
         });
 
         update.setDisable(true);
-        backqroundThread.restart();
+        updateMin.setDisable(true);
+        backqroundThread.start();
+    }
+
+    /**
+     * UPDATE SERVER
+     */
+    @FXML
+    private void updateServer() {
+        Service updateServerThread = new Service<Void>() {
+            protected Task<Void> createTask() {
+                return new Task<>() {
+                    protected Void call() {
+                        serverOperator.updateServer(pathServer, serviceNameQortes, serviceNameQortesDB, pathLastVersion, pathServerDir, exeNameQortes, exeNameQortesDB);
+                        return null;
+                    }
+                };
+            }
+        };
+
+        updateServerThread.setOnSucceeded(event -> update.setDisable(false));
+
+        update.setDisable(true);
+        updateServerThread.start();
     }
 
     /**
@@ -317,10 +582,35 @@ public class OptionListController {
                 };
             }
         };
-        backqroundThread.setOnSucceeded(event -> restart.setDisable(false));
+        backqroundThread.setOnSucceeded(event -> {
+            restart.setDisable(false);
+            restartMin.setDisable(false);
+        });
 
         restart.setDisable(true);
-        backqroundThread.restart();
+        restartMin.setDisable(true);
+        backqroundThread.start();
+    }
+
+    /**
+     * RESTART
+     */
+    @FXML
+    private void restartServer() {
+        Service restartServerThread = new Service<Void>() {
+            protected Task<Void> createTask() {
+                return new Task<>() {
+                    protected Void call() {
+                        serverOperator.restartServer(pathServer, serviceNameQortes, serviceNameQortesDB);
+                        return null;
+                    }
+                };
+            }
+        };
+        restartServerThread.setOnSucceeded(event -> restart.setDisable(false));
+
+        restart.setDisable(true);
+        restartServerThread.start();
     }
 
     /**
@@ -339,10 +629,36 @@ public class OptionListController {
             }
         };
 
-        threadStartCom.setOnSucceeded(event -> start.setDisable(false));
+        threadStartCom.setOnSucceeded(event -> {
+            start.setDisable(false);
+            startMin.setDisable(false);
+        });
 
         start.setDisable(true);
-        threadStartCom.restart();
+        startMin.setDisable(true);
+        threadStartCom.start();
+    }
+
+    /**
+     * START
+     */
+    @FXML
+    private void startServer() {
+        Service startServerThread = new Service<Void>() {
+            protected Task<Void> createTask() {
+                return new Task<>() {
+                    protected Void call() {
+                        serverOperator.startServer(pathServer, serviceNameQortes, serviceNameQortesDB);
+                        return null;
+                    }
+                };
+            }
+        };
+
+        startServerThread.setOnSucceeded(event -> start.setDisable(false));
+
+        start.setDisable(true);
+        startServerThread.start();
     }
 
     /**
@@ -361,10 +677,36 @@ public class OptionListController {
             }
         };
 
-        backqroundThread.setOnSucceeded(event -> stop.setDisable(false));
+        backqroundThread.setOnSucceeded(event -> {
+            stop.setDisable(false);
+            stopMin.setDisable(false);
+        });
 
         stop.setDisable(true);
-        backqroundThread.restart();
+        stopMin.setDisable(true);
+        backqroundThread.start();
+    }
+
+    /**
+     * STOP
+     */
+    @FXML
+    private void stopServer() {
+        Service stopServerThread = new Service<Void>() {
+            protected Task<Void> createTask() {
+                return new Task<>() {
+                    protected Void call() {
+                        serverOperator.stopServer(pathServer, serviceNameQortes, serviceNameQortesDB);
+                        return null;
+                    }
+                };
+            }
+        };
+
+        stopServerThread.setOnSucceeded(event -> stop.setDisable(false));
+
+        stop.setDisable(true);
+        stopServerThread.start();
     }
 
     /**
@@ -505,15 +847,19 @@ public class OptionListController {
                                             //noinspection Duplicates
                                             if (Objects.equals(currentComponentVersion, lastComponentVersion)) {
                                                 update.getStylesheets().clear();
-                                                update.getStylesheets().add("/ButtonGood.css");
+                                                updateMin.getStylesheets().clear();
+                                                update.getStylesheets().add(buttonGoodCSS);
+                                                updateMin.getStylesheets().add(buttonGoodCSS);
 
                                             } else {
                                                 update.getStylesheets().clear();
-                                                update.getStylesheets().add("/ButtonWarning.css");
+                                                updateMin.getStylesheets().clear();
+                                                update.getStylesheets().add(buttonWarningCSS);
+                                                updateMin.getStylesheets().add(buttonWarningCSS);
                                             }
                                         });
 
-                                        rollbackThread.restart();
+                                        rollbackThread.start();
                                     }
                             );
 
@@ -535,8 +881,39 @@ public class OptionListController {
 
         rollbackDates.getChildren().clear();
         getRollbackDates.setDisable(true);
-        backqroundThread.restart();
+        backqroundThread.start();
     }
 
+    private void getMinimizedButtons(Boolean isMinimized) {
+        if (contentHBox != null) {
+            if (isMinimized) {
+                updateMin.setText("U");
+                updateMin.setPrefWidth(100);
+                updateMin.setOnAction((e) -> updateComponent());
 
+                restartMin.setText("R");
+                restartMin.setPrefWidth(100);
+                restartMin.setOnAction((e) -> restartComponent());
+
+                startMin.setText("S");
+                startMin.setPrefWidth(100);
+                startMin.setOnAction((e) -> startComponent());
+
+                stopMin.setPrefWidth(100);
+                stopMin.setPrefHeight(30.0);
+                stopMin.setAlignment(Pos.CENTER);
+                Rectangle rectStopMin = new Rectangle();
+                rectStopMin.setHeight(10.0);
+                rectStopMin.setWidth(10.0);
+                stopMin.setGraphic(rectStopMin);
+                stopMin.setOnAction((e) -> stopComponent());
+
+                contentHBox.setPadding(new Insets(0, 10, 10, 10));
+                contentHBox.getChildren().addAll(updateMin, restartMin, startMin, stopMin);
+            } else {
+                contentHBox.setPadding(new Insets(0, 0, 0, 0));
+                contentHBox.getChildren().clear();
+            }
+        }
+    }
 }
