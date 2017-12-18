@@ -38,7 +38,8 @@ public class GUIGenerator extends Application {
     /**
      * Client-server features
      *
-     private EventLoopGroup workerGroup;*/
+    private EventLoopGroup workerGroup;*/
+  
     private HashSet<String> openComponentLists = new HashSet<>();
 
     public GUIGenerator() {

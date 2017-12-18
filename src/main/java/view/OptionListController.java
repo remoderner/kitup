@@ -300,6 +300,11 @@ public class OptionListController {
         threadMCS.start();
     }
 
+    public void setRootData(ArrayList<Tab> projectsList) {
+        projectsOverview.getTabs().addAll(projectsList);
+        titleLabel.setText("kitUP" + " / " + "1.7.6");
+    }
+
     public void setComponentData(Project project, Component component) {
         if (monitorVersionInterval < 10) {
             monitorVersionInterval = 30;
