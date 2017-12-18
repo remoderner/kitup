@@ -8,7 +8,7 @@
 <VBox xmlns:fx="http://javafx.com/fxml/1"
       prefWidth="180.0"
       fx:id="rootVBox"
-      stylesheets="MainStylesheet.css"
+      stylesheets="NewMain.css"
       styleClass="rootVBox"
       xmlns="http://javafx.com/javafx/9.0.0"
       fx:controller="view.OptionListController">
@@ -38,15 +38,15 @@
         </HBox>
     </HBox>
     <TextFlow prefHeight="15.0" prefWidth="130.0" textAlignment="CENTER">
-        <Text fx:id="serverVersionQortes" fontSmoothingType="LCD" textAlignment="CENTER"/>
+        <Text fx:id="serverVersionQortes" fontSmoothingType="LCD" textAlignment="CENTER" styleClass="versionText"/>
         <VBox.margin>
-            <Insets bottom="10.0" top="10.0"/>
+            <Insets top="15.0"/>
         </VBox.margin>
     </TextFlow>
     <TextFlow prefHeight="15.0" prefWidth="130.0" textAlignment="CENTER">
-        <Text fx:id="serverVersionQortesDB" fontSmoothingType="LCD" textAlignment="CENTER"/>
+        <Text fx:id="serverVersionQortesDB" fontSmoothingType="LCD" textAlignment="CENTER" styleClass="versionText"/>
         <VBox.margin>
-            <Insets bottom="10.0" top="10.0"/>
+            <Insets bottom="15.0" top="5"/>
         </VBox.margin>
     </TextFlow>
     <!--<HBox fx:id="contentHBox"
@@ -62,8 +62,6 @@
             <Button fx:id="start" onAction="#startServer" prefWidth="150" text="Start"/>
             <Button fx:id="stop" onAction="#stopServer" prefWidth="150" text="Stop"/>
             <HBox alignment="CENTER" spacing="10">
-                <Button fx:id="ini" onAction="#openIni" text="ini"/>
-                <Button fx:id="log" onAction="#openLog" text="log"/>
                 <Button fx:id="dir" onAction="#openDir" text="dir"/>
             </HBox>
         </VBox>

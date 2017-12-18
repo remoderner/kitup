@@ -2,6 +2,7 @@ package view;
 
 import bin.GUIGenerator;
 import classroom.Component;
+import classroom.KitupConfig;
 import classroom.Project;
 import classroom.Server;
 import javafx.application.Platform;
@@ -9,7 +10,6 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
@@ -17,7 +17,6 @@ import javafx.scene.control.TabPane;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
@@ -33,6 +32,7 @@ import java.util.Objects;
 
 public class OptionListController {
     private static final Logger logger = LogManager.getLogger(OptionListController.class);
+    private KitupConfig kitupConfig = KitupConfig.getKitupConfig();
 
     @FXML
     VBox rootVBox;
@@ -88,11 +88,17 @@ public class OptionListController {
     @FXML
     private Text componentVersion;
 
-    private String mainCSS = "/MainStylesheet.css";
-    private String buttonGoodCSS = "/ButtonGood.css";
-    private String buttonWarningCSS = "/ButtonWarning.css";
-    private String buttonStartCSS = "/ButtonStart.css";
-    private String buttonStopCSS = "/ButtonStop.css";
+    @FXML
+    private Text serverVersionQortes;
+
+    @FXML
+    private Text serverVersionQortesDB;
+
+    private String mainCSS = "/NewMain.css";
+    private String buttonGoodCSS = "/NewButtonGood.css";
+    private String buttonWarningCSS = "/NewButtonWarning.css";
+    private String buttonStartCSS = "/NewButtonStart.css";
+    private String buttonStopCSS = "/NewButtonStop.css";
 
     private String pathServer;
     private String pathSales;
@@ -101,6 +107,8 @@ public class OptionListController {
     private String pathComponent;
     private String componentName;
     private String lastComponentVersion;
+    private String lastServerVersionQortes;
+    private String lastServerVersionQortesDB;
     private String serviceNameQortes;
     private String serviceNameQortesDB;
     private String exeNameQortesDB;
@@ -110,10 +118,13 @@ public class OptionListController {
 
     private Boolean threadIsAlive = true;
     private Boolean isMinimized = false;
-    private Boolean isEntered = false;
+    private Boolean isExited = true;
     private Boolean isStoped = false;
 
-    private int dialogStageDefaultHeight = 330;
+    private int monitorVersionInterval = kitupConfig.getMonitorVersionInterval();
+    private int monitorStateInterval = kitupConfig.getMonitorStateInterval();
+
+    private int dialogStageDefaultHeight = 305;
     private int dialogStageHeight = dialogStageDefaultHeight;
 
     private Stage dialogStage;
@@ -133,13 +144,13 @@ public class OptionListController {
     public void windowFocused(Boolean isWindowFocused) {
         if (isWindowFocused) {
             if (!isMinimized) {
-                rootVBox.setStyle("-fx-border-color: #5accff");
-                titleLabel.setStyle("-fx-text-fill: black");
+                rootVBox.setStyle("-fx-border-color: #b4bfc3");
+                titleLabel.setStyle("-fx-text-fill: #b4bfc3");
             }
         } else {
             if (!isMinimized) {
-                rootVBox.setStyle("-fx-border-color: #c0c0c0");
-                titleLabel.setStyle("-fx-text-fill: gray");
+                rootVBox.setStyle("-fx-border-color: #1e2a31");
+                titleLabel.setStyle("-fx-text-fill: #b4bfc3");
             }
         }
     }
@@ -153,7 +164,7 @@ public class OptionListController {
         if (update != null) { // Last version when hovered on update button
             update.hoverProperty().addListener((obs, wasHovered, isNowHovered) -> {
                 if (isNowHovered) {
-                    if (!lastComponentVersion.equals("0.0.0.0")) {
+                    if (lastComponentVersion != null) {
                         update.setText(lastComponentVersion);
                     }
                 } else {
@@ -175,7 +186,7 @@ public class OptionListController {
             getMinimizedButtons(false);
             isMinimized = false;
         } else {
-            dialogStage.setHeight(110);
+            dialogStage.setHeight(108);
             getMinimizedButtons(true);
             isMinimized = true;
         }
@@ -184,11 +195,13 @@ public class OptionListController {
     @FXML
     public void setOnEntered(MouseEvent event) {
         if (isMinimized) {
-            dialogStage.setHeight(110);
+            dialogStage.setHeight(108);
             titleHBox.getStylesheets().clear();
             titleHBox.getStylesheets().add(mainCSS);
+            rootVBox.setStyle("-fx-border-color: #b4bfc3");
+            titleLabel.setStyle("-fx-text-fill: #b4bfc3");
         }
-        isEntered = true;
+        isExited = false;
     }
 
     @FXML
@@ -198,13 +211,17 @@ public class OptionListController {
                 dialogStage.setHeight(38);
                 titleHBox.getStylesheets().clear();
                 titleHBox.getStylesheets().add(buttonStopCSS);
+                rootVBox.setStyle("-fx-border-color: #1e2a31");
+                titleLabel.setStyle("-fx-text-fill: #1e2a31");
             } else {
                 dialogStage.setHeight(38);
                 titleHBox.getStylesheets().clear();
                 titleHBox.getStylesheets().add(update.getStylesheets().get(0));
+                rootVBox.setStyle("-fx-border-color: #1e2a31");
+                titleLabel.setStyle("-fx-text-fill: #1e2a31");
             }
         }
-        isEntered = false;
+        isExited = true;
     }
 
     @FXML
@@ -225,21 +242,24 @@ public class OptionListController {
     public void setGuiGenerator(GUIGenerator guiGenerator, Stage dialogStage) {
         this.guiGenerator = guiGenerator;
         this.dialogStage = dialogStage;
-        componentOperator = guiGenerator.getComponentOperator();
-        serverOperator = guiGenerator.getServerOperator();
         serviceOperator = guiGenerator.getServiceOperator();
-        componentOperator.setServiceOperator(serviceOperator);
-        componentOperator.setOptionListController(this);
-        serverOperator.setServiceOperator(serviceOperator);
-        serverOperator.setOptionListController(this);
     }
 
     public void setRootData(ArrayList<Tab> projectsList) {
         projectsOverview.getTabs().addAll(projectsList);
-        titleLabel.setText("kitUP" + " / " + "1.8.5");
+        titleLabel.setText("kitUP" + " / " + "2.0.3");
     }
 
     public void setServerData(Project project, Server server) {
+        if (monitorVersionInterval < 10) {
+            monitorVersionInterval = 30;
+        }
+        if (monitorStateInterval < 5) {
+            monitorStateInterval = 10;
+        }
+        serverOperator = new ServerOperator();
+        serverOperator.setServiceOperator(serviceOperator);
+        serverOperator.setOptionListController(this);
         pathServer = project.getServerName();
         pathSales = project.getSalesDirName();
         serviceNameQortes = server.getServiceNameQortes();
@@ -281,6 +301,15 @@ public class OptionListController {
     }
 
     public void setComponentData(Project project, Component component) {
+        if (monitorVersionInterval < 10) {
+            monitorVersionInterval = 30;
+        }
+        if (monitorStateInterval < 5) {
+            monitorStateInterval = 10;
+        }
+        componentOperator = new ComponentOperator();
+        componentOperator.setServiceOperator(serviceOperator);
+        componentOperator.setOptionListController(this);
         pathServer = project.getServerName();
         pathSales = project.getSalesDirName();
         serviceName = component.getServiceName();
@@ -332,7 +361,8 @@ public class OptionListController {
             componentStateNotificator("auto");
 
             try {
-                Thread.sleep(10000);
+                logger.info("wait " + monitorStateInterval + " seconds");
+                Thread.sleep(monitorStateInterval * 1000);
             } catch (InterruptedException e) {
                 logger.warn("WARNING: " + e.toString());
             }
@@ -347,7 +377,8 @@ public class OptionListController {
             serverStateNotificator("auto");
 
             try {
-                Thread.sleep(10000);
+                logger.info("wait " + monitorStateInterval + " seconds");
+                Thread.sleep(monitorStateInterval * 1000);
             } catch (InterruptedException e) {
                 logger.warn("WARNING: " + e.toString());
             }
@@ -377,7 +408,7 @@ public class OptionListController {
             }
 
             if (isMinimized) {
-                if (!isEntered) {
+                if (isExited) {
                     if (!isStoped) {
                         titleHBox.getStylesheets().clear();
                         titleHBox.getStylesheets().add(update.getStylesheets().get(0));
@@ -389,7 +420,8 @@ public class OptionListController {
             }
 
             try {
-                Thread.sleep(30000);
+                logger.info("wait " + monitorVersionInterval + " seconds");
+                Thread.sleep(monitorVersionInterval * 1000);
             } catch (InterruptedException e) {
                 logger.warn("WARNING: " + e.toString());
             }
@@ -402,11 +434,14 @@ public class OptionListController {
     private void monitorServerVersion() {
 
         while (threadIsAlive) {
-            String currentComponentVersion = componentOperator.getComponentVersion(componentName + ".dll", pathComponent, "FileVersion");
-            lastComponentVersion = componentOperator.getComponentVersion(componentName + ".dll", pathLastVersion, "FileVersion");
-            componentVersion.setText(currentComponentVersion);
+            String currentServerVersionQortes = serverOperator.getServerVersion(exeNameQortes, pathServerDir, "FileVersion");
+            String currentServerVersionQortesDB = serverOperator.getServerVersion(exeNameQortesDB, pathServerDir, "FileVersion");
+            lastServerVersionQortes = serverOperator.getServerVersion("Qortes" + ".exe", pathLastVersion, "FileVersion");
+            lastServerVersionQortesDB = serverOperator.getServerVersion("QortesDB" + ".exe", pathLastVersion, "FileVersion");
+            serverVersionQortes.setText("Qortes: " + currentServerVersionQortes);
+            serverVersionQortesDB.setText("QortesDB: " + currentServerVersionQortesDB);
             //noinspection Duplicates
-            if (Objects.equals(currentComponentVersion, lastComponentVersion)) {
+            if (Objects.equals(currentServerVersionQortes, lastServerVersionQortes) && Objects.equals(currentServerVersionQortesDB, lastServerVersionQortesDB)) {
                 update.getStylesheets().clear();
                 updateMin.getStylesheets().clear();
                 update.getStylesheets().add(buttonGoodCSS);
@@ -418,20 +453,9 @@ public class OptionListController {
                 updateMin.getStylesheets().add(buttonWarningCSS);
             }
 
-            if (isMinimized) {
-                if (!isEntered) {
-                    if (!isStoped) {
-                        titleHBox.getStylesheets().clear();
-                        titleHBox.getStylesheets().add(update.getStylesheets().get(0));
-                    } else {
-                        titleHBox.getStylesheets().clear();
-                        titleHBox.getStylesheets().add(buttonStopCSS);
-                    }
-                }
-            }
-
             try {
-                Thread.sleep(30000);
+                logger.info("wait " + monitorVersionInterval + " seconds");
+                Thread.sleep(monitorVersionInterval * 1000);
             } catch (InterruptedException e) {
                 logger.warn("WARNING: " + e.toString());
             }
@@ -456,9 +480,9 @@ public class OptionListController {
             start.getStylesheets().add(buttonStartCSS);
             startMin.getStylesheets().add(buttonStartCSS);
             if (isMinimized) {
-                if (!isEntered) {
+                if (isExited) {
                     titleHBox.getStylesheets().clear();
-                    titleHBox.getStylesheets().add(buttonStartCSS);
+                    titleHBox.getStylesheets().add(update.getStylesheets().get(0));
                 }
             }
             isStoped = false;
@@ -470,7 +494,7 @@ public class OptionListController {
             stop.getStylesheets().add(buttonStopCSS);
             stopMin.getStylesheets().add(buttonStopCSS);
             if (isMinimized) {
-                if (!isEntered) {
+                if (isExited) {
                     titleHBox.getStylesheets().clear();
                     titleHBox.getStylesheets().add(buttonStopCSS);
                 }
@@ -495,11 +519,11 @@ public class OptionListController {
         if ((serviceRunning && state.equals("auto")) || state.equals("start")) { //Если служба запущена
             stop.getStylesheets().clear();
             start.getStylesheets().clear();
-            start.getStylesheets().add("/ButtonStart.css");
+            start.getStylesheets().add(buttonStartCSS);
         } else {
             start.getStylesheets().clear();
             stop.getStylesheets().clear();
-            stop.getStylesheets().add("/ButtonStop.css");
+            stop.getStylesheets().add(buttonStopCSS);
         }
     }
 
@@ -529,7 +553,7 @@ public class OptionListController {
                 updateMin.getStylesheets().add(buttonGoodCSS);
 
                 if (isMinimized) {
-                    if (!isEntered) {
+                    if (isExited) {
                         titleHBox.getStylesheets().clear();
                         titleHBox.getStylesheets().add(buttonGoodCSS);
                     }
@@ -561,7 +585,21 @@ public class OptionListController {
             }
         };
 
-        updateServerThread.setOnSucceeded(event -> update.setDisable(false));
+        updateServerThread.setOnSucceeded(event -> {
+            String currentServerVersionQortes = serverOperator.getServerVersion(exeNameQortes, pathServerDir, "FileVersion");
+            String currentServerVersionQortesDB = serverOperator.getServerVersion(exeNameQortesDB, pathServerDir, "FileVersion");
+            lastServerVersionQortes = serverOperator.getServerVersion("Qortes" + ".exe", pathLastVersion, "FileVersion");
+            lastServerVersionQortesDB = serverOperator.getServerVersion("QortesDB" + ".exe", pathLastVersion, "FileVersion");
+
+            if (Objects.equals(currentServerVersionQortes, lastServerVersionQortes) && Objects.equals(currentServerVersionQortesDB, lastServerVersionQortesDB)) {
+                update.getStylesheets().clear();
+                update.getStylesheets().add(buttonGoodCSS);
+            }
+
+            update.setDisable(false);
+            serverVersionQortes.setText("Qortes: " + currentServerVersionQortes);
+            serverVersionQortesDB.setText("QortesDB: " + currentServerVersionQortesDB);
+        });
 
         update.setDisable(true);
         updateServerThread.start();
@@ -757,7 +795,7 @@ public class OptionListController {
     }
 
     /**
-     * DIR
+     * OPEN DIR
      */
     @FXML
     private void openDir() {
@@ -765,7 +803,12 @@ public class OptionListController {
             protected Task<Void> createTask() {
                 return new Task<>() {
                     protected Void call() {
-                        String link = pathComponent;
+                        String link;
+                        if (pathComponent != null) {
+                            link = pathComponent;
+                        } else {
+                            link = pathServerDir;
+                        }
                         guiGenerator.getFileOpener().openDir(link);
                         return null;
                     }
@@ -805,7 +848,7 @@ public class OptionListController {
                             Button button = new Button();
                             Button fixButton = new Button();
 
-                            fixButton.getStylesheets().add("/FixButton.css");
+                            fixButton.getStylesheets().add("/NewFixButton.css");
                             fixButton.setText("fix");
                             fixButton.setOnAction(e -> {
                                 button.setDisable(true);
@@ -816,9 +859,10 @@ public class OptionListController {
                             button.setGraphic(fixButton);
                             button.setText(entry.getKey());
                             button.setPrefWidth(108);
+                            button.setPrefHeight(25);
                             button.setOnAction(
                                     (e) -> {
-                                        button.getStylesheets().add("/MainStylesheet.css");
+                                        button.getStylesheets().add("/NewMain.css");
                                         button.setDisable(true);
                                         /*
                                          * Запуск отката компоненты в отдельном потоке
@@ -899,13 +943,8 @@ public class OptionListController {
                 startMin.setPrefWidth(100);
                 startMin.setOnAction((e) -> startComponent());
 
+                stopMin.setText("S");
                 stopMin.setPrefWidth(100);
-                stopMin.setPrefHeight(30.0);
-                stopMin.setAlignment(Pos.CENTER);
-                Rectangle rectStopMin = new Rectangle();
-                rectStopMin.setHeight(10.0);
-                rectStopMin.setWidth(10.0);
-                stopMin.setGraphic(rectStopMin);
                 stopMin.setOnAction((e) -> stopComponent());
 
                 contentHBox.setPadding(new Insets(0, 10, 10, 10));

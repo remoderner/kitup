@@ -5,7 +5,7 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.layout.*?>
 <VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="rootVBox" prefWidth="200.0" styleClass="rootVBox"
-      stylesheets="MainStylesheet.css" xmlns="http://javafx.com/javafx/9.0.0" fx:controller="view.OptionListController">
+      stylesheets="NewMainRoot.css" xmlns="http://javafx.com/javafx/9.0.0" fx:controller="view.OptionListController">
     <HBox fx:id="titleHBox" onMouseDragged="#setOnDragged" onMousePressed="#setOnPressed" prefHeight="20.0"
           styleClass="title-bar">
         <HBox alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
@@ -23,7 +23,7 @@
             </Label>
             <Label onMouseClicked="#closeWindow" styleClass="close-button" text="X">
                 <HBox.margin>
-                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                    <Insets bottom="5.0" right="5.0" top="5.0"/>
                 </HBox.margin>
             </Label>
         </HBox>

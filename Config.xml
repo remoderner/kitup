@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <config>
     <config>
+        <logger
+                status="off"/>
+        <monitoringInterval
+                monitorVersion="30"
+                monitorState="10"/>
         <ignoredCopyFilesOnUpdate
                 ignoreByFileName=""
                 ignoreByFileType="ini"/>
@@ -11,12 +16,12 @@
     <project projectName="back" serverName="" salesDirName="D:\foldersales\">
         <server
                 serverName="Server"
-                serviceNameQortes="Qortes"
-                serviceNameQortesDB="QortesDB"
-                exeNameQortes="Qortes_RENAME"
-                exeNameQortesDB="QortesDB_RENAME"
+                serviceNameQortes="2GISUpdateService"
+                serviceNameQortesDB="2GISUpdateService"
+                exeNameQortes="Qortes_RENAME.exe"
+                exeNameQortesDB="QortesDB_RENAME.exe"
                 lastVersionDirName="D:\foldersource\"
-                serverDirName="D:\foldertarget\"/>
+                serverDirName="D:\folderservertarget\"/>
         <component
                 componentName="srvTest"
                 serviceName="2GISUpdateService"
@@ -29,12 +34,12 @@
                 componentDirName="D:\foldertarget\srvTest2\"/>
         <component
                 componentName="srvTest3"
-                serviceName="2GISUpdateService"
+                serviceName="BFE"
                 lastVersionDirName="D:\foldersource\srvTest3\"
                 componentDirName="D:\foldertarget\srvTest3\"/>
         <component
                 componentName="srvTest4"
-                serviceName="2GISUpdateService"
+                serviceName="BFE"
                 lastVersionDirName="D:\foldersource\srvTest4\"
                 componentDirName="D:\foldertarget\srvTest4\"/>
         <component

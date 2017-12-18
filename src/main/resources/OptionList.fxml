@@ -10,7 +10,7 @@
       fx:id="rootVBox"
       onMouseEntered="#setOnEntered"
       onMouseExited="#setOnExited"
-      stylesheets="MainStylesheet.css"
+      stylesheets="NewMain.css"
       styleClass="rootVBox"
       xmlns="http://javafx.com/javafx/9.0.0"
       fx:controller="view.OptionListController">
@@ -34,13 +34,13 @@
             </Label>
             <Label onMouseClicked="#closeWindow" styleClass="close-button" text="X">
                 <HBox.margin>
-                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                    <Insets bottom="5.0" right="5.0" top="5.0"/>
                 </HBox.margin>
             </Label>
         </HBox>
     </HBox>
     <TextFlow prefHeight="15.0" prefWidth="130.0" textAlignment="CENTER">
-        <Text fx:id="componentVersion" fontSmoothingType="LCD" textAlignment="CENTER"/>
+        <Text fx:id="componentVersion" fontSmoothingType="LCD" textAlignment="CENTER" styleClass="versionText"/>
         <VBox.margin>
             <Insets bottom="10.0" top="10.0"/>
         </VBox.margin>
@@ -62,7 +62,8 @@
                 <Button fx:id="log" onAction="#openLog" text="log"/>
                 <Button fx:id="dir" onAction="#openDir" text="dir"/>
             </HBox>
-            <TitledPane alignment="CENTER" animated="false" collapsible="false" text="Rollback">
+            <TitledPane alignment="CENTER" animated="false" collapsible="false" text="Rollback"
+                        styleClass="rollbackTitledPane">
                 <graphic>
                     <Button fx:id="getRollbackDates" onAction="#getRollbackDates" text="get"/>
                 </graphic>

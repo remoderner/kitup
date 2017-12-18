@@ -141,17 +141,37 @@ public class FileOperator {
         }
     }
 
-    void renameFiles(String sourceDirName, String targetDirName, String exeNameQortes, String exeNameQortesDB) {
-        String qortesExeLink = sourceDirName + "qortes.exe";
-        String qortesDBExeLink = sourceDirName + "qortesDB.exe";
+    void copyFile(String copyFileLink, String targetDirName) {
+        log.info(copyFileLink + " | " + targetDirName);
+        Path destDir = Paths.get(targetDirName);
+        File fileToCopy = new File(copyFileLink);
+
+        try {
+            Files.copy(fileToCopy.toPath(), destDir.resolve(fileToCopy.getName()), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    void renameFiles(String targetDirName, String exeNameQortes, String exeNameQortesDB) {
+        String qortesExeLink = targetDirName + "qortes.exe";
+        String qortesDBExeLink = targetDirName + "qortesdb.exe";
+        log.info(qortesExeLink);
+        log.info(qortesDBExeLink);
 
         String qortesExeNewName = targetDirName + exeNameQortes;
         String qortesDBExeNewName = targetDirName + exeNameQortesDB;
 
-        Boolean QortesExeRename = new File(qortesExeLink).renameTo(new File(qortesExeNewName));
-        Boolean QortesDBExeRename = new File(qortesDBExeLink).renameTo(new File(qortesDBExeNewName));
+        Boolean qortesExeRename;
+        Boolean qortesDBExeRename;
 
-        log.debug("QortesExeRename: " + QortesExeRename);
-        log.debug("QortesDBExeRename: " + QortesDBExeRename);
+        qortesExeRename = new File(qortesExeLink).renameTo(new File(qortesExeNewName));
+        log.debug("qortesExeNewName: " + qortesExeNewName);
+        log.debug("qortesExeRename: " + qortesExeRename);
+
+        qortesDBExeRename = new File(qortesDBExeLink).renameTo(new File(qortesDBExeNewName));
+        log.debug("qortesDBExeNewName: " + qortesDBExeNewName);
+        log.debug("qortesDBExeRename: " + qortesDBExeRename);
+
     }
 }

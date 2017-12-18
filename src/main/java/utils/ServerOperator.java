@@ -7,6 +7,7 @@ import view.OptionListController;
 public class ServerOperator {
     private static final Logger log = LogManager.getLogger(ComponentOperator.class);
     private FileOperator fileOperator = new FileOperator();
+    private FileInformator fileInformator = new FileInformator();
     private ServiceOperator serviceOperator;
     private OptionListController optionListController;
 
@@ -35,9 +36,11 @@ public class ServerOperator {
                 + "pathServerDir: " + pathServerDir);
 
         stopServer(pathServer, serviceNameQortes, serviceNameQortesDB);
-        fileOperator.deleteFile(pathServerDir + "Starter.log");
-        fileOperator.copyFiles(pathLastVersion, pathServerDir, null, false);
-        fileOperator.renameFiles(pathServer, pathServer, exeNameQortes, exeNameQortesDB);
+        fileOperator.deleteFile(pathServerDir + exeNameQortes);
+        fileOperator.deleteFile(pathServerDir + exeNameQortesDB);
+        fileOperator.copyFile(pathLastVersion + "Qortes.exe", pathServerDir);
+        fileOperator.copyFile(pathLastVersion + "QortesDB.exe", pathServerDir);
+        fileOperator.renameFiles(pathServerDir, exeNameQortes, exeNameQortesDB);
         startServer(pathServer, serviceNameQortes, serviceNameQortesDB);
     }
 
@@ -90,5 +93,16 @@ public class ServerOperator {
                 }
             }
         }
+    }
+
+    /**
+     * GET SERVER VERSION
+     * <p>
+     * Вернуть ссылка на актульный лог сервера
+     */
+    public String getServerVersion(String serverName, String pathServer, String infoType) {
+        String fileVersion = fileInformator.getFileVersion(pathServer + serverName, infoType);
+        log.info(serverName + ": " + fileVersion);
+        return fileVersion;
     }
 }
