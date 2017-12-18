@@ -1,5 +1,6 @@
 package utils;
 
+import classroom.KitupConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 
 public class FileOperator {
     private static final Logger log = LogManager.getLogger(ComponentOperator.class);
+    private KitupConfig kitupConfig = KitupConfig.getKitupConfig();
 
     public void openFile(String link) {
         log.info(link);
@@ -70,38 +72,106 @@ public class FileOperator {
 
         if (listOfFiles != null) {
             for (File file : listOfFiles) {
-                if (!file.getName().endsWith(".ini")) { //Только файлы, т.е. не копируем папки
-                    alreadyCopiedFiles.add(file.getName());
-                }
+                alreadyCopiedFiles.add(file.getName());
             }
         }
 
         return alreadyCopiedFiles;
     }
 
-    void copyFiles(String sourceDirName, String componentDirName, ArrayList<String> alreadyCopiedFiles) { //Копирование файлов из одной дериктории в другую
+    void copyFiles(String sourceDirName, String targetDirName, ArrayList<String> alreadyCopiedFiles, Boolean isRollback) { //Копирование файлов из одной дериктории в другую
         File folder = new File(sourceDirName);
         File[] listOfFiles = folder.listFiles(File::isFile);
-        Path destDir = Paths.get(componentDirName);
+
+        ArrayList<String> ignoredCopiedFiles;
+        if (alreadyCopiedFiles == null) {
+            ignoredCopiedFiles = new ArrayList<>();
+        } else {
+            ignoredCopiedFiles = alreadyCopiedFiles;
+        }
+
+        Path destDir = Paths.get(targetDirName);
         log.info("Copying files...");
         log.info("FROM: " + sourceDirName);
-        log.info("TO: " + componentDirName);
+        log.info("TO: " + targetDirName);
 
         if (listOfFiles != null) {
             for (File file : listOfFiles) {
-                if (!file.getName().endsWith(".ini")) { //Только файлы, т.е. не копируем папки
-                    if (alreadyCopiedFiles != null && alreadyCopiedFiles.contains(file.getName())) {
-                        continue;
+                if (isRollback) {
+                    for (int i = 0; i < kitupConfig.getIgnoreByFileNameListOnRollback().size(); i++) {
+                        if (file.getName().equals(kitupConfig.getIgnoreByFileNameListOnRollback().get(i))) {
+                            ignoredCopiedFiles.add(file.getName());
+                            break;
+                        }
                     }
 
-                    log.info(file.getName());
-                    try {
-                        Files.copy(file.toPath(), destDir.resolve(file.getName()), StandardCopyOption.REPLACE_EXISTING);
-                    } catch (IOException e) {
-                        log.warn("WARNING: " + e.toString());
+                    for (int i = 0; i < kitupConfig.getIgnoreByFileTypeListOnRollback().size(); i++) {
+                        if (file.getName().endsWith("." + kitupConfig.getIgnoreByFileTypeListOnRollback().get(i))) {
+                            ignoredCopiedFiles.add(file.getName());
+                            break;
+                        }
                     }
+                } else {
+                    for (int i = 0; i < kitupConfig.getIgnoreByFileNameListOnUpdate().size(); i++) {
+                        if (file.getName().equals(kitupConfig.getIgnoreByFileNameListOnUpdate().get(i))) {
+                            ignoredCopiedFiles.add(file.getName());
+                            break;
+                        }
+                    }
+
+                    for (int i = 0; i < kitupConfig.getIgnoreByFileTypeListOnUpdate().size(); i++) {
+                        if (file.getName().endsWith("." + kitupConfig.getIgnoreByFileTypeListOnUpdate().get(i))) {
+                            ignoredCopiedFiles.add(file.getName());
+                            break;
+                        }
+                    }
+                }
+
+                if (ignoredCopiedFiles.contains(file.getName())) {
+                    continue;
+                }
+
+                log.info(file.getName());
+                try {
+                    Files.copy(file.toPath(), destDir.resolve(file.getName()), StandardCopyOption.REPLACE_EXISTING);
+                } catch (IOException e) {
+                    log.warn("WARNING: " + e.toString());
                 }
             }
         }
+    }
+
+    void copyFile(String copyFileLink, String targetDirName) {
+        log.info(copyFileLink + " | " + targetDirName);
+        Path destDir = Paths.get(targetDirName);
+        File fileToCopy = new File(copyFileLink);
+
+        try {
+            Files.copy(fileToCopy.toPath(), destDir.resolve(fileToCopy.getName()), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    void renameFiles(String targetDirName, String exeNameQortes, String exeNameQortesDB) {
+        String qortesExeLink = targetDirName + "qortes.exe";
+        String qortesDBExeLink = targetDirName + "qortesdb.exe";
+        log.info(qortesExeLink);
+        log.info(qortesDBExeLink);
+
+        String qortesExeNewName = targetDirName + exeNameQortes;
+        String qortesDBExeNewName = targetDirName + exeNameQortesDB;
+
+        Boolean qortesExeRename;
+        Boolean qortesDBExeRename;
+
+        qortesExeRename = new File(qortesExeLink).renameTo(new File(qortesExeNewName));
+        log.debug("qortesExeNewName: " + qortesExeNewName);
+        log.debug("qortesExeRename: " + qortesExeRename);
+
+        qortesDBExeRename = new File(qortesDBExeLink).renameTo(new File(qortesDBExeNewName));
+        log.debug("qortesDBExeNewName: " + qortesDBExeNewName);
+        log.debug("qortesDBExeRename: " + qortesDBExeRename);
+
     }
 }

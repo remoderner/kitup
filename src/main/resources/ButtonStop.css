@@ -14,3 +14,21 @@
 .button:hover {
     -fx-background-color: #ff7878, #ff5a5a, #ff7878;
 }
+
+.title-bar {
+    -fx-background-size: 100% 100%;
+    -fx-background-color: #ff9696;
+}
+
+.mini-button {
+    -fx-border-color: #ff9696;
+}
+
+.mini-button:hover {
+    -fx-background-color: #ff9696, #ff5a5a, #ff9696;
+    -fx-focus-traversable: false;
+}
+
+.close-button {
+    -fx-border-color: #ff9696;
+}
